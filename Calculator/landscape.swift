@@ -159,13 +159,14 @@ enum BtnType{
 
 
 struct Landscape: View{
-    @State var num:String = numCalc.num //화면에 보여지는 수
+    @State var num:String = Calculation.displayNum //화면에 보여지는 수
     @State private var btnData:[[BtnType]] = [
         [.lbrac,.rbrac,.mc,.m_add,.m_sub,.mr,.allClear,.oppo,.perc,.div],
         [.sec,.x2,.x3,.xy,.ex,.tenx,._7,._8,._9,.mul],
         [.rev,.x_2,.x_3,.x_y,.ln,.log10,._4,._5,._6,.sub],
         [.xf,.sin,.cos,.tan,.e,.EE,._1,._2,._3,.add],
-        [.rad,.sinh,.cosh,.tanh,.pi,.rand,._0,.dot,.equal]]
+        [.rad,.sinh,.cosh,.tanh,.pi,.rand,._0,.dot,.equal]
+    ]
     
     var body:some View{
         ZStack{
@@ -204,25 +205,25 @@ struct Landscape: View{
                                 }
                                 else if row == .clear || row == .allClear{
                                     btnData[0][6] = .allClear
-                                    num = numCalc.Clear()
+                                    num = Calculation.Clear()
                                 }
                                 else if row == .oppo{
-                                    num = numCalc.Opposite()
+                                    num = Calculation.Opposite()
                                 }
                                 else if row == .perc{
-                                    num = numCalc.Percent()
+                                    num = Calculation.Percent()
                                 }
                                 else if row == .div{ //바로 계산
-                                    num = numCalc.Div()
+                                    num = Calculation.Div()
                                 }
                                 else if row == .sec{
                                     
                                 }
                                 else if row == .x2{
-                                    num = numCalc.X2()
+                                    num = Calculation.X2()
                                 }
                                 else if row == .x3{
-                                    num = numCalc.X3()
+                                    num = Calculation.X3()
                                 }
                                 else if row == .xy{
                                     
@@ -234,7 +235,7 @@ struct Landscape: View{
                                     
                                 }
                                 else if row == .mul{ //바로 계산
-                                    num = numCalc.Mul()
+                                    num = Calculation.Mul()
                                 }
                                 else if row == .rev{
                                     
@@ -255,7 +256,7 @@ struct Landscape: View{
                                     
                                 }
                                 else if row == .sub{
-                                    num = numCalc.Sub()
+                                    num = Calculation.Sub()
                                 }
                                 else if row == .xf{
                                     
@@ -276,7 +277,7 @@ struct Landscape: View{
                                     
                                 }
                                 else if row == .add{
-                                    num = numCalc.Add()
+                                    num = Calculation.Add()
                                 }
                                 else if row == .rad{
                                     
@@ -299,11 +300,11 @@ struct Landscape: View{
                                 else if row == .dot{
                                     if !num.contains(".") && num != "오류"{
                                         btnData[0][0] = .clear
-                                        num = numCalc.Dot()
+                                        num = Calculation.Dot()
                                     }
                                 }
                                 else if row == .equal{
-                                    num = numCalc.Equal()
+                                    num = Calculation.Equal()
                                 }
                                 else{ //숫자키들 모음
                                     

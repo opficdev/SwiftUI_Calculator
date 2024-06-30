@@ -9,14 +9,15 @@ import Foundation
 import SwiftUI
 
 struct Portrait: View{
-    @State var num:String = numCalc.num //화면에 보여지는 수
+    @State var num:String = Calculation.displayNum //화면에 보여지는 수
 
     @State private var btnData:[[BtnType]] = [
         [.allClear,.oppo,.perc,.div],
         [._7,._8,._9,.mul],
         [._4,._5,._6,.sub],
         [._1,._2,._3,.add],
-        [._0,.dot,.equal]]
+        [._0,.dot,.equal]
+    ]
     
     var body: some View {
         ZStack{
@@ -40,37 +41,37 @@ struct Portrait: View{
                                 numFmt1.numberStyle = .decimal //지수 형태 변환 (가로 모드)
                                 if row == .clear || row == .allClear{
                                     btnData[0][0] = .allClear
-                                    num = numCalc.Clear()
+                                    num = Calculation.Clear()
                                 }
                                 else if row == .oppo{ //문제
-                                    num = numCalc.Opposite()
+                                    num = Calculation.Opposite()
                                 }
                                 else if row == .perc{
-                                    num = numCalc.Percent()
+                                    num = Calculation.Percent()
                                 }
                                 else if row == .add{
-                                    num = numCalc.Add()
+                                    num = Calculation.Add()
                                 }
                                 else if row == .sub{
-                                    num = numCalc.Sub()
+                                    num = Calculation.Sub()
                                 }
                                 else if row == .mul{ //바로 계산
-                                    num = numCalc.Mul()
+                                    num = Calculation.Mul()
                                 }
                                 else if row == .div{ //바로 계산
-                                    num = numCalc.Div()
+                                    num = Calculation.Div()
                                 }
                                 else if row == .equal{
-                                    num = numCalc.Equal()
+                                    num = Calculation.Equal()
                                 }
                                 else if row == .dot{
                                     if !num.contains(".") && num != "오류"{
                                         btnData[0][0] = .clear
-                                        num = numCalc.Dot()
+                                        num = Calculation.Dot()
                                     }
                                 }
                                 else{ //숫자키들 모음
-                                    num = numCalc.setNum(newNum:row.BtnDisplay)
+                                    num = Calculation.setNum(newNum:row.BtnDisplay)
                                 }
                             }label: {
                                 Text(row.BtnDisplay)
