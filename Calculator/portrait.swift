@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct Portrait: View{
-    @State var num:String = Calculation.displayNum //화면에 보여지는 수
+    @State var num:String = "0" //화면에 보여지는 수
 
     @State private var btnData:[[BtnType]] = [
         [.allClear,.oppo,.perc,.div],
@@ -43,7 +43,7 @@ struct Portrait: View{
                                     btnData[0][0] = .allClear
                                     num = Calculation.Clear()
                                 }
-                                else if row == .oppo{ //문제
+                                else if row == .oppo{
                                     num = Calculation.Opposite()
                                 }
                                 else if row == .perc{
@@ -55,22 +55,21 @@ struct Portrait: View{
                                 else if row == .sub{
                                     num = Calculation.Sub()
                                 }
-                                else if row == .mul{ //바로 계산
+                                else if row == .mul{
                                     num = Calculation.Mul()
                                 }
-                                else if row == .div{ //바로 계산
+                                else if row == .div{ 
                                     num = Calculation.Div()
                                 }
                                 else if row == .equal{
                                     num = Calculation.Equal()
                                 }
                                 else if row == .dot{
-                                    if !num.contains(".") && num != "오류"{
-                                        btnData[0][0] = .clear
-                                        num = Calculation.Dot()
-                                    }
+                                    btnData[0][0] = .clear
+                                    num = Calculation.Dot()
                                 }
                                 else{ //숫자키들 모음
+                                    
                                     num = Calculation.setNum(newNum:row.BtnDisplay)
                                 }
                             }label: {
