@@ -69,7 +69,7 @@ struct Portrait: View{
                                     num = Calculation.Dot()
                                 }
                                 else{ //숫자키들 모음
-                                    
+                                    btnData[0][0] = .clear
                                     num = Calculation.setNum(newNum:row.BtnDisplay)
                                 }
                             }label: {
