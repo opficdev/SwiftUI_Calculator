@@ -3,17 +3,21 @@
 //  Calculator
 //
 //  Created by 최윤진 on 2023/08/10.
-//  개발 중 스파게티 코드가 되어 아예 리팩터링 중
+//
+//  2 + 3 * 4 * 5 * -> 60 출력 (우선순위가 높은것들만 우선 계산)
+//  2 + 3 * 4 * 5 = -> 62 출력 (식 전체 계산)
 
 import Foundation
 
 
 class Calculation{
-    private static var displayNum:String = "0"  //화면에 보여지는 수
-    private static var infix_Expr:[String] = []  // 입력 식(중위)
+    private static var displayNum:String = "0"  //  화면에 보여지는 수
+    static var infix_Expr:[String] = ["0"]  // 입력 식(중위) / 입력이 3, + 일 경우 정상적인 연산이 되어야 하므로 ["0"]으로 초기화
     private static var isNewInput = true    //  숫자가 입력되는 것이 처음인지
+    private static var lastOp = ""  //  마지막으로 입력된 연산자
     
-    private static func priority(_ op: String) -> Int{    // 연산자 우선순위
+    // 연산자 우선순위
+    private static func priority(_ op: String) -> Int{
         if op == "(" || op == ")"{
             return 0
         }
@@ -26,7 +30,8 @@ class Calculation{
         return -1
     }
     
-    private static func endsWithNumber() -> Bool{ // 입력된 식의 마지막이 숫자인지 판별
+    // 입력된 식의 마지막이 숫자인지 판별
+    private static func endsWithNumber() -> Bool{
         let last = infix_Expr.last  // nil이면 식 infix_Expr이 빈 것
         if last == nil || (last != "+" && last != "-" && last != "*" && last != "/" && last != "(" && last != ")"){
             return true
@@ -34,7 +39,8 @@ class Calculation{
         return false
     }
     
-    private static func infix_Postfix() -> [String]{ //입력된 수식을 우선순위에 맞게 후위표기로 변경
+    //입력된 수식을 연산자 우선순위에 맞게 후위표기로 변경
+    private static func infix_Postfix() -> [String]{
         var postfix:[String] = []
         var stack:[String] = []
         for i in infix_Expr{
@@ -64,8 +70,8 @@ class Calculation{
         return postfix
     }
     
-    
-    private static func calculation() -> String{ //변경된 후위표기로 계산
+    //변경된 후위표기 식을 스택을 통해 계산
+    private static func calculation(endWithPrio1: Bool = true) -> String{ // endsWithPrio1: 마지막으로 식에 입력되는 연산자가 + || - 이면 참
         let postfix = infix_Postfix()
         var stack:[String] = []
         for i in postfix{
@@ -76,9 +82,17 @@ class Calculation{
                 let num2 = stack.popLast()!
                 let num1 = stack.popLast()!
                 if i == "+"{
+                    if !endWithPrio1{
+                        stack.append(num2)
+                        break
+                    }
                     stack.append((NSDecimalNumber(string: num1).adding(NSDecimalNumber(string: num2))).stringValue)
                 }
                 else if i == "-"{
+                    if !endWithPrio1{
+                        stack.append(num2)
+                        break
+                    }
                     stack.append((NSDecimalNumber(string: num1).subtracting(NSDecimalNumber(string: num2))).stringValue)
                 }
                 else if i == "*"{
@@ -94,16 +108,20 @@ class Calculation{
                 }
             }
         }
-        return stack.popLast()!
+        return stack.removeLast()
     }
     
-    
-    
-    static func setNum(newNum:String) -> String{ //키패드에서 숫자 입력받는 부분
+    //키패드에서 숫자 입력받는 함수
+    static func setNum(newNum: String) -> String{
         if displayNum == "0" || displayNum == "오류" || isNewInput{
             displayNum = newNum
             isNewInput = false
-            infix_Expr.append(displayNum)
+            if infix_Expr == ["0"]{ //  초기 상태일 때
+                infix_Expr[0] = newNum
+            }
+            else{
+                infix_Expr.append(newNum)
+            }
         }
         else{
             displayNum += newNum
@@ -112,14 +130,17 @@ class Calculation{
         return displayNum
     }
     
-    static func Clear() -> String{ //clear 버튼
+    //clear 버튼
+    static func Clear() -> String{
         displayNum = "0"
         isNewInput = true
-        infix_Expr.removeAll()
+        lastOp = ""
+        infix_Expr = ["0"]
         return displayNum
     }
     
-    static func Opposite() -> String { // +/- 버튼
+    // +/- 버튼
+    static func Opposite() -> String {
         if displayNum.first == "-"{
             displayNum.removeFirst()
         }
@@ -130,57 +151,82 @@ class Calculation{
         return displayNum
     }
     
-    static func Percent() -> String { // % 버튼
+    // % 버튼
+    static func Percent() -> String {
         isNewInput = true
         return displayNum
     }
     
-    static func Add() -> String { // + 버튼
+    // + 버튼
+    static func Add() -> String {
         if !endsWithNumber(){
-            infix_Expr.removeLast()
-        }
-        infix_Expr.append("+")
-        isNewInput = true
-        return displayNum
-    }
-    
-    static func Sub() -> String { // - 버튼
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
-        }
-        infix_Expr.append("-")
-        isNewInput = true
-        return displayNum
-    }
-    
-    static func Mul() -> String { // * 버튼
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
-        }
-        infix_Expr.append("*")
-        isNewInput = true
-        return displayNum
-    }
-    
-    static func Div() -> String { // / 버튼
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
-        }
-        infix_Expr.append("/")
-        isNewInput = true
-        return displayNum
-    }
-    
-    static func Equal() -> String {  // = 버튼
-        if !endsWithNumber(){ //부호로 식이 끝났을 때
             infix_Expr.removeLast()
         }
         displayNum = calculation()
+        infix_Expr.append("+")
+        lastOp = "+"
         isNewInput = true
         return displayNum
     }
     
-    static func Dot() -> String { // 소수점 버튼
+    // - 버튼
+    static func Sub() -> String {
+        if !endsWithNumber(){
+            infix_Expr.removeLast()
+        }
+        displayNum = calculation()
+        infix_Expr.append("-")
+        lastOp = "-"
+        isNewInput = true
+        return displayNum
+    }
+    
+    // * 버튼
+    static func Mul() -> String {
+        if !endsWithNumber(){
+            infix_Expr.removeLast()
+        }
+        displayNum = calculation(endWithPrio1: false)
+        
+        infix_Expr.append("*")
+        lastOp = "*"
+        isNewInput = true
+        return displayNum
+    }
+    
+    // / 버튼
+    static func Div() -> String {
+        if !endsWithNumber(){
+            infix_Expr.removeLast()
+        }
+        displayNum = calculation(endWithPrio1: false)
+        infix_Expr.append("/")
+        lastOp = "/"
+        isNewInput = true
+        return displayNum
+    }
+    
+    // = 버튼
+    static func Equal() -> String {
+        if !endsWithNumber(){ //부호로 식이 끝났을 때
+            infix_Expr.append(infix_Expr[infix_Expr.count - 2]) //입력이 2, + 일 때 = 을 계속 누르면 해당 연산이 계속 이어져 나가야 함
+        }
+        if lastOp == "="{   //연속으로 = 를 입력할 시
+            lastOp = infix_Expr[infix_Expr.count - 2]
+            let lastNum = infix_Expr.last!
+            infix_Expr = [calculation()]
+            infix_Expr.append(lastOp)
+            infix_Expr.append(lastNum)
+        }
+        displayNum = calculation()
+        isNewInput = true
+        lastOp = "="
+        
+        return displayNum
+    }
+    
+    // 소수점 버튼
+    static func Dot() -> String {
         if displayNum == "오류"{
             displayNum = "0."
             
