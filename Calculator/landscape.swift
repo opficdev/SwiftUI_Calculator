@@ -159,7 +159,7 @@ enum BtnType{
 
 
 struct Landscape: View{
-    @State var num:String = "0" //화면에 보여지는 수
+    @State var num:String //화면에 보여지는 수
     @State private var btnData:[[BtnType]] = [
         [.lbrac,.rbrac,.mc,.m_add,.m_sub,.mr,.allClear,.oppo,.perc,.div],
         [.sec,.x2,.x3,.xy,.ex,.tenx,._7,._8,._9,.mul],
@@ -167,6 +167,15 @@ struct Landscape: View{
         [.xf,.sin,.cos,.tan,.e,.EE,._1,._2,._3,.add],
         [.rad,.sinh,.cosh,.tanh,.pi,.rand,._0,.dot,.equal]
     ]
+    
+    init(){
+        self.num = Calculation.num
+        if !Calculation.isEmpty{
+            var tmp = btnData
+            tmp[0][6] = .clear
+            _btnData = State(initialValue: tmp)
+        }
+    }
     
     var body:some View{
         ZStack{

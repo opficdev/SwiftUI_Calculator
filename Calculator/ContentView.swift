@@ -25,6 +25,7 @@ class DeviceOrientationManager: ObservableObject {
 struct ContentView: View {
     @StateObject private var orientationManager = DeviceOrientationManager()
     @State private var wasPortrait = true
+    @State private var rotated = false //   한번이라도 기울어진 적이 있는가
     
     var body: some View {
         VStack {

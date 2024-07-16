@@ -12,9 +12,20 @@ import Foundation
 
 class Calculation{
     private static var displayNum:String = "0"  //  화면에 보여지는 수
-    static var infix_Expr:[String] = ["0"]  // 입력 식(중위) / 입력이 3, + 일 경우 정상적인 연산이 되어야 하므로 ["0"]으로 초기화
+    private static var infix_Expr:[String] = ["0"]  // 입력 식(중위) / 입력이 3, + 일 경우 정상적인 연산이 되어야 하므로 ["0"]으로 초기화
     private static var isNewInput = true    //  숫자가 입력되는 것이 처음인지
     private static var lastOp = ""  //  마지막으로 입력된 연산자
+    
+    static var num: String {
+        return displayNum
+    }
+    
+    static var isEmpty: Bool{
+        if infix_Expr.count == 1{
+            return infix_Expr[0] == "0"
+        }
+        return false
+    }
     
     // 연산자 우선순위
     private static func priority(_ op: String) -> Int{
@@ -159,50 +170,58 @@ class Calculation{
     
     // + 버튼
     static func Add() -> String {
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
+        if displayNum != "오류"{
+            if !endsWithNumber(){
+                infix_Expr.removeLast()
+            }
+            displayNum = calculation()
+            infix_Expr.append("+")
+            lastOp = "+"
+            isNewInput = true
         }
-        displayNum = calculation()
-        infix_Expr.append("+")
-        lastOp = "+"
-        isNewInput = true
         return displayNum
     }
     
     // - 버튼
     static func Sub() -> String {
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
+        if displayNum != "오류"{
+            if !endsWithNumber(){
+                infix_Expr.removeLast()
+            }
+            displayNum = calculation()
+            infix_Expr.append("-")
+            lastOp = "-"
+            isNewInput = true
         }
-        displayNum = calculation()
-        infix_Expr.append("-")
-        lastOp = "-"
-        isNewInput = true
         return displayNum
     }
     
     // * 버튼
     static func Mul() -> String {
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
+        if displayNum != "오류"{
+            if !endsWithNumber(){
+                infix_Expr.removeLast()
+            }
+            displayNum = calculation(endWithPrio1: false)
+            
+            infix_Expr.append("*")
+            lastOp = "*"
+            isNewInput = true
         }
-        displayNum = calculation(endWithPrio1: false)
-        
-        infix_Expr.append("*")
-        lastOp = "*"
-        isNewInput = true
         return displayNum
     }
     
     // / 버튼
     static func Div() -> String {
-        if !endsWithNumber(){
-            infix_Expr.removeLast()
+        if displayNum != "오류"{
+            if !endsWithNumber(){
+                infix_Expr.removeLast()
+            }
+            displayNum = calculation(endWithPrio1: false)
+            infix_Expr.append("/")
+            lastOp = "/"
+            isNewInput = true
         }
-        displayNum = calculation(endWithPrio1: false)
-        infix_Expr.append("/")
-        lastOp = "/"
-        isNewInput = true
         return displayNum
     }
     

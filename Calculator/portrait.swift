@@ -9,15 +9,24 @@ import Foundation
 import SwiftUI
 
 struct Portrait: View{
-    @State var num:String = "0" //화면에 보여지는 수
-
-    @State private var btnData:[[BtnType]] = [
+    @State var num: String //화면에 보여지는 수
+    @State private var btnData: [[BtnType]] = [
         [.allClear,.oppo,.perc,.div],
         [._7,._8,._9,.mul],
         [._4,._5,._6,.sub],
         [._1,._2,._3,.add],
         [._0,.dot,.equal]
     ]
+    
+    init(){
+        self.num = Calculation.num
+        if !Calculation.isEmpty{
+            var tmp = btnData
+            tmp[0][0] = .clear
+            _btnData = State(initialValue: tmp)
+        }
+    }
+
     
     var body: some View {
         ZStack{
@@ -33,7 +42,7 @@ struct Portrait: View{
                         .lineLimit(1)
 //                        .border(Color.white)
                 }
-                ForEach(btnData,id:\.self){col in
+                ForEach(btnData,id: \.self){col in
                     HStack{
                         ForEach(col,id: \.self) {row in
                             Button{
