@@ -24,32 +24,45 @@ class DeviceOrientationManager: ObservableObject {
 
 struct ContentView: View {
     @StateObject private var orientationManager = DeviceOrientationManager()
+    @StateObject private var calculation = Calculation()
     @State private var wasPortrait = true
     @State private var rotated = false //   한번이라도 기울어진 적이 있는가
+    @State private var num = "0"
     
     var body: some View {
         VStack {
-            if orientationManager.orientation.isFlat {
-                if wasPortrait{
-                    Portrait()
+            if orientationManager.orientation == .portraitUpsideDown {
+                if rotated && !wasPortrait {
+                    Landscape(num: $num).environmentObject(calculation).onAppear {
+                        wasPortrait = false
+                    }
                 }
-                else{
-                    Landscape()
+                else {
+                    Portrait(num: $num).environmentObject(calculation).onAppear {
+                        rotated = true
+                    }
                 }
             }
-            else if orientationManager.orientation.isPortrait {
-                Portrait().onAppear(){
-                    wasPortrait = true
+            else if orientationManager.orientation.isFlat {
+                if wasPortrait {
+                    Portrait(num: $num)
+                        .environmentObject(calculation)
+                } else {
+                    Landscape(num: $num)
+                        .environmentObject(calculation)
                 }
             }
             else if orientationManager.orientation.isLandscape {
-                Landscape().onAppear(){
+                Landscape(num: $num).environmentObject(calculation).onAppear {
                     wasPortrait = false
                 }
             }
             else {
-                Text("Unknown orientation")
+                Portrait(num: $num).environmentObject(calculation).onAppear {
+                    wasPortrait = true
+                }
             }
+
         }
         .onAppear {
             UIDevice.current.beginGeneratingDeviceOrientationNotifications()
@@ -66,10 +79,3 @@ extension UIDeviceOrientation {
     }
 }
 
-
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
