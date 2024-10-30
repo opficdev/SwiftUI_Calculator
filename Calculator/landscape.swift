@@ -159,7 +159,7 @@ enum BtnType{
 
 
 struct Landscape: View{
-    @State var num:String //화면에 보여지는 수
+    @Binding var num:String //화면에 보여지는 수
     @State private var btnData:[[BtnType]] = [
         [.lbrac,.rbrac,.mc,.m_add,.m_sub,.mr,.allClear,.oppo,.perc,.div],
         [.sec,.x2,.x3,.xy,.ex,.tenx,._7,._8,._9,.mul],
@@ -167,15 +167,7 @@ struct Landscape: View{
         [.xf,.sin,.cos,.tan,.e,.EE,._1,._2,._3,.add],
         [.rad,.sinh,.cosh,.tanh,.pi,.rand,._0,.dot,.equal]
     ]
-    
-    init(){
-        self.num = Calculation.num
-        if !Calculation.isEmpty{
-            var tmp = btnData
-            tmp[0][6] = .clear
-            _btnData = State(initialValue: tmp)
-        }
-    }
+    @EnvironmentObject var calc: Calculation
     
     var body:some View{
         ZStack{
@@ -214,25 +206,25 @@ struct Landscape: View{
                                 }
                                 else if row == .clear || row == .allClear{
                                     btnData[0][6] = .allClear
-                                    num = Calculation.Clear()
+                                    num = calc.Clear()
                                 }
                                 else if row == .oppo{
-                                    num = Calculation.Opposite()
+                                    num = calc.Opposite()
                                 }
                                 else if row == .perc{
-                                    num = Calculation.Percent()
+                                    num = calc.Percent()
                                 }
                                 else if row == .div{ //바로 계산
-                                    num = Calculation.Div()
+                                    num = calc.Div()
                                 }
                                 else if row == .sec{
                                     
                                 }
                                 else if row == .x2{
-                                    num = Calculation.X2()
+                                    num = calc.X2()
                                 }
                                 else if row == .x3{
-                                    num = Calculation.X3()
+                                    num = calc.X3()
                                 }
                                 else if row == .xy{
                                     
@@ -244,7 +236,7 @@ struct Landscape: View{
                                     
                                 }
                                 else if row == .mul{ //바로 계산
-                                    num = Calculation.Mul()
+                                    num = calc.Mul()
                                 }
                                 else if row == .rev{
                                     
@@ -265,7 +257,7 @@ struct Landscape: View{
                                     
                                 }
                                 else if row == .sub{
-                                    num = Calculation.Sub()
+                                    num = calc.Sub()
                                 }
                                 else if row == .xf{
                                     
@@ -286,7 +278,7 @@ struct Landscape: View{
                                     
                                 }
                                 else if row == .add{
-                                    num = Calculation.Add()
+                                    num = calc.Add()
                                 }
                                 else if row == .rad{
                                     
@@ -309,11 +301,11 @@ struct Landscape: View{
                                 else if row == .dot{
                                     if !num.contains(".") && num != "오류"{
                                         btnData[0][0] = .clear
-                                        num = Calculation.Dot()
+                                        num = calc.Dot()
                                     }
                                 }
                                 else if row == .equal{
-                                    num = Calculation.Equal()
+                                    num = calc.Equal()
                                 }
                                 else{ //숫자키들 모음
                                     
@@ -340,12 +332,4 @@ struct Landscape: View{
     }
 }
 
-
-struct Previews_landscape_Previews: PreviewProvider {
-    static var previews: some View {
-        return Landscape().previewLayout(.fixed(width: 896, height: 414))
-    
-        
-    }
-}
  
