@@ -9,66 +9,61 @@ import SwiftUI
 import UIKit
 import Combine
 
-class DeviceOrientationManager: ObservableObject {
-    @Published var orientation: UIDeviceOrientation = UIDevice.current.orientation
+// ViewModel 역할: Orientation 관리와 뷰 상태 관리
+class OrientationViewModel: ObservableObject {
+    private var orientation: UIDeviceOrientation = UIDevice.current.orientation
+    @Published var isPortrait: Bool = true
     
     private var orientationDidChange: AnyCancellable?
     
     init() {
+        updateOrientation(UIDevice.current.orientation)
+        // Orientation 변경사항을 관찰
         orientationDidChange = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
             .compactMap { $0.object as? UIDevice }
             .map { $0.orientation }
-            .assign(to: \.orientation, on: self)
+            .sink { [weak self] newOrientation in
+                self?.updateOrientation(newOrientation)
+            }
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+    }
+    
+    // Orientation 상태를 업데이트하는 함수
+    private func updateOrientation(_ newOrientation: UIDeviceOrientation) {
+        orientation = newOrientation
+        switch orientation {
+//        case .portrait:
+//            isPortrait = true
+        case .landscapeLeft, .landscapeRight, .portraitUpsideDown:
+                isPortrait = false
+//        case .faceUp, .faceDown, .portraitUpsideDown:
+//            break
+        default:
+            isPortrait = true
+            break
+        }
+    }
+    
+    deinit {
+        UIDevice.current.endGeneratingDeviceOrientationNotifications()
     }
 }
 
 struct ContentView: View {
-    @StateObject private var orientationManager = DeviceOrientationManager()
-    @StateObject private var calculation = Calculation()
-    @State private var wasPortrait = true
-    @State private var rotated = false //   한번이라도 기울어진 적이 있는가
-    @State private var num = "0"
+    @StateObject private var orientation = OrientationViewModel()
+    @StateObject private var viewModel = CalculatorViewModel()
     
     var body: some View {
         VStack {
-            if orientationManager.orientation == .portraitUpsideDown {
-                if rotated && !wasPortrait {
-                    Landscape(num: $num).environmentObject(calculation).onAppear {
-                        wasPortrait = false
-                    }
-                }
-                else {
-                    Portrait(num: $num).environmentObject(calculation).onAppear {
-                        rotated = true
-                    }
-                }
+            if orientation.isPortrait {
+                Portrait()
+                    .environmentObject(orientation)
+                    .environmentObject(viewModel)
+            } else {
+                Landscape()
+                    .environmentObject(orientation)
+                    .environmentObject(viewModel)
             }
-            else if orientationManager.orientation.isFlat {
-                if wasPortrait {
-                    Portrait(num: $num)
-                        .environmentObject(calculation)
-                } else {
-                    Landscape(num: $num)
-                        .environmentObject(calculation)
-                }
-            }
-            else if orientationManager.orientation.isLandscape {
-                Landscape(num: $num).environmentObject(calculation).onAppear {
-                    wasPortrait = false
-                }
-            }
-            else {
-                Portrait(num: $num).environmentObject(calculation).onAppear {
-                    wasPortrait = true
-                }
-            }
-
-        }
-        .onAppear {
-            UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-        }
-        .onDisappear {
-            UIDevice.current.endGeneratingDeviceOrientationNotifications()
         }
     }
 }
@@ -78,4 +73,3 @@ extension UIDeviceOrientation {
         return self == .faceUp || self == .faceDown
     }
 }
-
