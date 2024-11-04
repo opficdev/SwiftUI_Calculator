@@ -34,8 +34,8 @@ class CalculatorViewModel: ObservableObject {
     
     // 입력된 식의 마지막이 숫자인지 판별
     private func endsWithNumber() -> Bool {
-       let last = infix_Expr.last  // nil이면 식 infix_Expr이 빈 것
-        if last == nil || (last != "+" && last != "-" && last != "*" && last != "/" && last != "(" && last != ")"){
+        let last = infix_Expr.last  // nil이면 식 infix_Expr이 빈 것
+        if last == nil || (last != "+" && last != "-" && last != "*" && last != "/"){
             return true
         }
         return false
@@ -56,7 +56,7 @@ class CalculatorViewModel: ObservableObject {
                 stack.append(i)
             }
             else if i == ")" {
-               var top_op = stack.popLast()!
+                var top_op = stack.popLast()!
                 while top_op != "("{
                     postfix.append(top_op)
                     top_op = stack.popLast()!
@@ -81,32 +81,35 @@ class CalculatorViewModel: ObservableObject {
                 stack.append(i)
             }
             else {
-               let num2 = stack.popLast()!
-               let num1 = stack.popLast()!
-                if i == "+"{
-                    if !endWithPrio1 {
-                        stack.append(num2)
-                        break
-                    }
-                    stack.append((NSDecimalNumber(string: num1).adding(NSDecimalNumber(string: num2))).stringValue)
-                }
-                else if i == "-" {
-                    if !endWithPrio1{
-                        stack.append(num2)
-                        break
-                    }
-                    stack.append((NSDecimalNumber(string: num1).subtracting(NSDecimalNumber(string: num2))).stringValue)
-                }
-                else if i == "*" {
-                    stack.append((NSDecimalNumber(string: num1).multiplying(by: NSDecimalNumber(string: num2))).stringValue)
-                }
-                else if i == "/" {
-                    if num1 != "0" {
+                if let num2 = stack.popLast(), let num1 = stack.popLast() {
+                    if i == "+"{
+                        if !endWithPrio1 {
+                            stack.append(num2)
+                            break
+                        }
                         stack.append((NSDecimalNumber(string: num1).adding(NSDecimalNumber(string: num2))).stringValue)
                     }
-                    else{   // 0으로 나누는 예외처리
-                        return "오류"
+                    else if i == "-" {
+                        if !endWithPrio1{
+                            stack.append(num2)
+                            break
+                        }
+                        stack.append((NSDecimalNumber(string: num1).subtracting(NSDecimalNumber(string: num2))).stringValue)
                     }
+                    else if i == "*" {
+                        stack.append((NSDecimalNumber(string: num1).multiplying(by: NSDecimalNumber(string: num2))).stringValue)
+                    }
+                    else if i == "/" {
+                        if num1 != "0" {
+                            stack.append((NSDecimalNumber(string: num1).adding(NSDecimalNumber(string: num2))).stringValue)
+                        }
+                        else{   // 0으로 나누는 예외처리
+                            return "오류"
+                        }
+                    }
+                }
+                else {
+                    return "오류"
                 }
             }
         }
@@ -135,26 +138,31 @@ class CalculatorViewModel: ObservableObject {
     func handleButtonPress(_ button: BtnType) {
         if button == .lbrac {
             if displayNum != "오류" {
-                if endsWithNumber() {
+                if endsWithNumber() && !isEmpty {
                     infix_Expr.append("*")
                 }
                 infix_Expr.append("(")
             }
         }
         else if button == .rbrac {
-            // Handle right bracket operation
+            if displayNum != "오류" {
+                if endsWithNumber() && !isEmpty {
+                    infix_Expr.append("*")
+                }
+                infix_Expr.append(")")
+            }
         }
         else if button == .mc {
-            // Handle memory clear
+            
         }
         else if button == .m_add {
-            // Handle memory add
+            
         }
         else if button == .m_sub {
-            // Handle memory subtract
+            
         }
         else if button == .mr {
-            // Handle memory recall
+            
         }
         else if button == .clear || button == .allClear {
             displayNum = "0"
@@ -189,7 +197,7 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .sec {
-            // Handle secant calculation
+            
         }
         else if button == .x2 {
             
@@ -198,13 +206,13 @@ class CalculatorViewModel: ObservableObject {
             
         }
         else if button == .xy {
-            // Handle x^y calculation
+            
         }
         else if button == .ex {
-            // Handle e^x calculation
+            
         }
         else if button == .tenx {
-            // Handle 10^x calculation
+            
         }
         else if button == .mul {
             if displayNum != "오류" {
@@ -219,22 +227,22 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .rev {
-            // Handle 1/x calculation
+            
         }
         else if button == .x_2 {
-            // Handle x^(1/2) calculation
+            
         }
         else if button == .x_3 {
-            // Handle x^(1/3) calculation
+            
         }
         else if button == .x_y {
-            // Handle x^(1/y) calculation
+            
         }
         else if button == .ln {
-            // Handle natural logarithm calculation
+            
         }
         else if button == .log10 {
-            // Handle base-10 logarithm calculation
+            
         }
         else if button == .sub {
             if displayNum != "오류" {
@@ -248,22 +256,22 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .xf {
-            // Handle factorial calculation
+            
         }
         else if button == .sin {
-            // Handle sine calculation
+            
         }
         else if button == .cos {
-            // Handle cosine calculation
+            
         }
         else if button == .tan {
-            // Handle tangent calculation
+            
         }
         else if button == .e {
-            // Handle Euler's number calculation
+            
         }
         else if button == .EE {
-            // Handle scientific notation calculation
+            
         }
         else if button == .add {
             if displayNum != "오류" {
@@ -277,22 +285,22 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .rad {
-            // Handle radian conversion
+            
         }
         else if button == .sinh {
-            // Handle hyperbolic sine calculation
+            
         }
         else if button == .cosh {
-            // Handle hyperbolic cosine calculation
+            
         }
         else if button == .tanh {
-            // Handle hyperbolic tangent calculation
+            
         }
         else if button == .pi {
-            // Handle π input
+            
         }
         else if button == .rand {
-            // Handle random number generation
+            
         }
         else if button == .dot {
             if displayNum == "오류" {
@@ -308,7 +316,7 @@ class CalculatorViewModel: ObservableObject {
             }
             if lastOp == "=" {   //연속으로 = 를 입력할 시
                 lastOp = infix_Expr[infix_Expr.count - 2]
-               let lastNum = infix_Expr.last!
+                let lastNum = infix_Expr.last!
                 infix_Expr = [calculation()]
                 infix_Expr.append(lastOp)
                 infix_Expr.append(lastNum)
