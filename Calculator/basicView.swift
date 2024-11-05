@@ -14,7 +14,7 @@ struct Portrait: View {
         [._7, ._8, ._9, .mul],
         [._4, ._5, ._6, .sub],
         [._1, ._2, ._3, .add],
-        [._0, .dot, .equal]
+        [.emoji, ._0, .dot, .equal]
     ]
 
     var body: some View {
@@ -30,15 +30,15 @@ struct Portrait: View {
                         .minimumScaleFactor(0.65)
                         .lineLimit(1)
                         .onAppear() {
-                            if viewModel.displayNum == "0" {
+                            if viewModel.currentAC {
                                 btnData[0][0] = .allClear
                             }
                             else {
                                 btnData[0][0] = .clear
                             }
                         }
-                        .onChange(of: viewModel.displayNum) { newValue in
-                            if newValue == "0" {
+                        .onChange(of: viewModel.currentAC) { newValue in
+                            if newValue {
                                 btnData[0][0] = .allClear
                             }
                             else {
@@ -52,16 +52,22 @@ struct Portrait: View {
                             Button(action: {
                                 viewModel.handleButtonPress(button)
                             }) {
-                                Text(button.BtnDisplay)
-                                    .padding(button == .some(._0) ? 30 : 0)
-                                    .frame(width: button == .some(._0) ? 182 : 80, height: 80,
-                                           alignment: button == .some(._0) ? .leading : .center)
+                                ButtonLabelView(button: button.BtnDisplay)
+                                    .frame(width: 80, height: 80, alignment: .center)
                                     .background(button.backgroundColor)
                                     .cornerRadius(40)
-                                    .foregroundColor(button.foregroundColor)
-                                    .font(.system(size: button.backgroundColor == Color.orange ? 45 : 35,
-                                                  weight: button == .some(.dot) || button.backgroundColor == Color.orange ? .medium : .regular))
+                                    .foregroundColor(Color.white)
+                                    .font(.system(size: 35))
                                     .padding(6)
+                            }
+                            .onLongPressGesture() {} onPressingChanged: { _ in
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    if let buttonImage = button.BtnDisplay.image,
+                                        buttonImage == Image(systemName: "delete.backward") {
+                                        btnData[0][0] = .allClear
+                                        viewModel.handleButtonPress(.allClear)
+                                    }
+                                }
                             }
                         }
                     }

@@ -10,119 +10,122 @@ import SwiftUI
 enum BtnType{
     case _1, _2, _3, _4, _5, _6, _7, _8, _9, _0
     case dot, equal, add, sub, mul, div
-    case allClear,clear, oppo, perc
+    case allClear, clear, oppo, perc
     case lbrac, rbrac, mc, m_add, m_sub, mr
     case sec, x2, x3, xy, ex, tenx
     case rev, x_2, x_3, x_y, ln, log10
     case xf, sin, cos, tan, e, EE
     case rad, sinh, cosh, tanh, pi, rand
+    case emoji
     
-    var BtnDisplay:String{
+    var BtnDisplay: button {
         switch self {
         case ._0:
-            return "0"
+            return button(string: "0")
         case ._1:
-            return "1"
+            return button(string: "1")
         case ._2:
-            return "2"
+            return button(string: "2")
         case ._3:
-            return "3"
+            return button(string: "3")
         case ._4:
-            return "4"
+            return button(string: "4")
         case ._5:
-            return "5"
+            return button(string: "5")
         case ._6:
-            return "6"
+            return button(string: "6")
         case ._7:
-            return "7"
+            return button(string: "7")
         case ._8:
-            return "8"
+            return button(string: "8")
         case ._9:
-            return "9"
+            return button(string: "9")
         case .dot:
-            return "."
+            return button(string: ".")
         case .equal:
-            return "="
+            return button(image: "equal")
         case .add:
-            return "+"
+            return button(image: "plus")
         case .sub:
-            return "﹣"
+            return button(image: "minus")
         case .mul:
-            return "×"
+            return button(image: "multiply")
         case .div:
-            return "÷"
+            return button(image: "divide")
         case .allClear:
-            return "AC"
+            return button(string: "AC")
         case .clear:
-            return "C"
+            return button(image: "delete.backward")
         case .oppo:
-            return "⁺⁄₋"
+            return button(image: "plus.forwardslash.minus")
         case .perc:
-            return "%"
+            return button(image: "percent")
         case .lbrac:
-            return "("
+            return button(string: "(")
         case .rbrac:
-            return ")"
+            return button(string: ")")
         case .mc:
-            return "mc"
+            return button(string: "mc")
         case .m_add:
-            return "m+"
+            return button(string: "m+")
         case .m_sub:
-            return "m-"
+            return button(string: "m-")
         case .mr:
-            return "mr"
+            return button(string: "mr")
         case .sec:
-            return "2nd"
+            return button(string: "2nd")
         case .x2:
-            return "x²"
+            return button(string: "x²")
         case .x3:
-            return "x³"
+            return button(string: "x³")
         case .xy:
-            return "xʸ"
+            return button(string: "xʸ")
         case .ex:
-            return "eˣ"
+            return button(string: "𝑒ˣ")
         case .tenx:
-            return "10ˣ"
+            return button(string: "10ˣ")
         case .rev:
-            return "¹∕ｘ"
+            return button(string: "¹∕ｘ")
         case .x_2:
-            return "²√ⅹ"
+            return button(string: "²√ⅹ")
         case .x_3:
-            return "³√ⅹ"
+            return button(string: "³√ⅹ")
         case .x_y:
-            return "ʸ√ⅹ"
+            return button(string: "ʸ√ⅹ")
         case .ln:
-            return "ln"
+            return button(string: "ln")
         case .log10:
-            return "log₁₀"
+            return button(string: "log₁₀")
         case .xf:
-            return "x!"
+            return button(string: "x!")
         case .sin:
-            return "sin"
+            return button(string: "sin")
         case .cos:
-            return "cos"
+            return button(string: "cos")
         case .tan:
-            return "tan"
+            return button(string: "tan")
         case .e:
-            return "e"
+            return button(string: "𝑒")
         case .EE:
-            return "EE"
+            return button(string: "EE")
         case .rad:
-            return "Rad"
+            return button(string: "Rad")
         case .sinh:
-            return "sinh"
+            return button(string: "sinh")
         case .cosh:
-            return "cosh"
+            return button(string: "cosh")
         case .tanh:
-            return "tanh"
+            return button(string: "tanh")
         case .pi:
-            return "π"
+            return button(string: "π")
         case .rand:
-            return "Rand"
+            return button(string: "Rand")
+        case .emoji:
+            return button(image: "circle.grid.3x3.fill") // 계산기 SF Symbols가 없음
         }
     }
     
-    var backgroundColor:Color{
+    var backgroundColor: Color{
         switch self{
         case ._0,._1,._2,._3,._4,._5,._6,._7,._8,._9,.dot:
             return Color("numBtn")
@@ -135,22 +138,40 @@ enum BtnType{
         }
     }
     
-    var foregroundColor:Color{
-        switch self{
-        case .allClear,.clear,.oppo,.perc:
-            return Color.black
-        default:
-            return Color.white
-        }
-    }
-    var BtnSize:CGFloat{
+    var BtnSize: CGFloat{
         switch self{
         case ._0,._1,._2,._3,._4,._5,._6,._7,._8,._9,.dot,.allClear,.clear,.oppo,.perc:
             return CGFloat(20)
         case .add,.sub,.mul,.div,.equal:
-            return CGFloat(30)
+            return CGFloat(25)
         default:
             return CGFloat(15)
+        }
+    }
+}
+
+struct button {
+    let string: String?
+    let image: Image?
+    
+    init(string: String? = nil, image: String? = nil) {
+        self.string = string
+        if let image = image {
+            self.image = Image(systemName: image)
+        } else {
+            self.image = nil
+        }
+    }
+}
+
+struct ButtonLabelView: View {
+    let button: button
+    
+    var body: some View {
+        if let image = button.image {
+            image
+        } else if let text = button.string {
+            Text(text)
         }
     }
 }

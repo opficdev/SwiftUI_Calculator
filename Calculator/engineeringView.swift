@@ -15,7 +15,7 @@ struct Landscape: View {
         [.sec, .x2, .x3, .xy, .ex, .tenx, ._7, ._8, ._9, .mul],
         [.rev, .x_2, .x_3, .x_y, .ln, .log10, ._4, ._5, ._6, .sub],
         [.xf, .sin, .cos, .tan, .e, .EE, ._1, ._2, ._3, .add],
-        [.rad, .sinh, .cosh, .tanh, .pi, .rand, ._0, .dot, .equal]
+        [.emoji, .rad, .sinh, .cosh, .tanh, .pi, .rand, ._0, .dot, .equal]
     ]
     
     var body: some View {
@@ -52,13 +52,11 @@ struct Landscape: View {
                             Button {
                                 viewModel.handleButtonPress(button)
                             } label: {
-                                Text(button.BtnDisplay)
-                                    .padding(button == .some(._0) ? 30 : 0)
-                                    .frame(width: button == .some(._0) ? 150 : 68, height: 50,
-                                           alignment: button == .some(._0) ? .leading : .center)
+                                ButtonLabelView(button: button.BtnDisplay)
+                                    .frame(width: 68, height: 50, alignment: .center)
                                     .background(button.backgroundColor)
                                     .cornerRadius(25)
-                                    .foregroundColor(button.foregroundColor)
+                                    .foregroundColor(Color.white)
                                     .font(.system(size: button.BtnSize, weight: .medium))
                                     .padding(.vertical, 3)
                             }
