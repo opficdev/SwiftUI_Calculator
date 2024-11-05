@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ButtonLabelView: View {
+    let button: button
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        if let image = button.image {
+            image
+        } else if let text = button.string {
+            Text(text)
+        }
     }
-}
-
-#Preview {
-    ButtonLabelView()
 }
