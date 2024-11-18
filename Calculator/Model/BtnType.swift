@@ -12,10 +12,10 @@ enum BtnType{
     case dot, equal, add, sub, mul, div
     case allClear, clear, oppo, perc
     case lbrac, rbrac, mc, m_add, m_sub, mr
-    case sec, x2, x3, xy, ex, tenx
+    case _2nd, x2, x3, xy, ex, tenx
     case rev, x_2, x_3, x_y, ln, log10
     case xf, sin, cos, tan, e, EE
-    case rad, sinh, cosh, tanh, pi, rand
+    case rad, sinh, cosh, tanh, pi, rand, deg
     case emoji
     
     var BtnDisplay: button {
@@ -72,7 +72,7 @@ enum BtnType{
             return button(string: "m-")
         case .mr:
             return button(string: "mr")
-        case .sec:
+        case ._2nd:
             return button(string: "2nd")
         case .x2:
             return button(string: "x²")
@@ -120,6 +120,8 @@ enum BtnType{
             return button(string: "π")
         case .rand:
             return button(string: "Rand")
+        case .deg:
+            return button(string: "Deg")
         case .emoji:
             return button(image: "circle.grid.3x3.fill") // 계산기 SF Symbols가 없음
         }
