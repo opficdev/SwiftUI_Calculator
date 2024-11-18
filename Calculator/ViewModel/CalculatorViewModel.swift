@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Combine
 
 class CalculatorViewModel: ObservableObject {
     @Published var displayNum:String = "0"  //  화면에 보여지는 수
@@ -201,7 +200,7 @@ class CalculatorViewModel: ObservableObject {
                 isNewInput = true
             }
         }
-        else if button == .sec {
+        else if button == ._2nd {
             
         }
         else if button == .x2 {
