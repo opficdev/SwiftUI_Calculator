@@ -53,6 +53,9 @@ enum iPhonePointRes: String {
     
     static func currentDeviceModel() -> iPhonePointRes? {
         let identifier = getDeviceIdentifier()
+        if identifier == "arm64" {  // 시뮬레이터를 위한 코드
+            return iPhonePointRes(identifier: "iPhone17,1")
+        }
         return iPhonePointRes(identifier: identifier)
     }
     
