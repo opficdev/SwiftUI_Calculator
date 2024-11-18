@@ -13,7 +13,8 @@ struct ButtonLabelView: View {
     var body: some View {
         if let image = button.image {
             image
-        } else if let text = button.string {
+        }
+        else if let text = button.string {
             Text(text)
         }
     }
