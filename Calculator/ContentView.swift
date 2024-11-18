@@ -12,6 +12,8 @@ struct ContentView: View {
     @StateObject private var orientation = OrientationViewModel()
     @StateObject private var viewModel = CalculatorViewModel()
     @State private var sheetOn = false
+    @State private var isScientific = true //  후에 UserDefaults로 옮길 것
+    
     let ud = UserDefaults.standard
     
     var body: some View {
@@ -23,10 +25,14 @@ struct ContentView: View {
                     .font(.system(size: 25))
                     .foregroundColor(Color.orange)
             })
-            .padding(.horizontal)
-            BasicView()
-                .environmentObject(OrientationViewModel())
-                .environmentObject(viewModel)
+            if orientation.isPortrait {
+                PortraitView(isScientific: $isScientific)
+                    .environmentObject(viewModel)
+            }
+            else {
+                
+            }
+           
         }
         .sheet(isPresented: $sheetOn) {
             
@@ -39,6 +45,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(OrientationViewModel())
-        .environmentObject(CalculatorViewModel())
 }
