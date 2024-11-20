@@ -28,8 +28,8 @@ class HistoryViewModel: ObservableObject { // @AppStorage로 뷰마다 바인딩
         return defaults.bool(forKey: key)
     }
     
-    func array(forKey key: String) -> Bool? {
-        return defaults.bool(forKey: key)
+    func array(forKey key: String) -> Array<Any>? {
+        return defaults.array(forKey: key)
     }
     
     func removeObject(foKey key: String) {
