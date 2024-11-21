@@ -8,15 +8,12 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
-    @Published var displayNum:String = "0"  //  화면에 보여지는 수(흰색)
     @Published var history = "" // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
-    @Published var showSelection = false // 모드 선택 버튼 on off
+    @Published var displayExpr:String = "0"  //  화면에 보여지는 수(흰색)
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
     private var newNumInput = true // 새로운 숫자가 입력되는지
-    private let fmt = NumberFormatter()
-
     
     // 연산자 우선순위
     private func priority(_ op: String) -> Int {
@@ -104,7 +101,7 @@ class CalculatorViewModel: ObservableObject {
                 else {
                     isError = true
                     newNumInput = false
-                    return displayNum //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
+                    return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
                 }
             }
         }
@@ -129,7 +126,23 @@ class CalculatorViewModel: ObservableObject {
         }
         return stack.count == 0
     }
-
+    
+    private func setNumberFmt(string: String) -> String {
+        let fmt = NumberFormatter()
+        fmt.numberStyle = .decimal
+        if let intValue = Int(string), let stringValue = fmt.string(from: NSNumber(value: intValue)) {
+            return stringValue
+        }
+        return string
+    }
+    
+    private func setdisplayExprFmt() {
+        let fmt = NumberFormatter()
+        fmt.numberStyle = .decimal
+        if let intValue = Int(displayExpr), let stringValue = fmt.string(from: NSNumber(value: intValue)) {
+            displayExpr = stringValue
+        }
+    }
     
     func handleButtonPress(_ button: BtnType) {
         if button == .add {
@@ -139,10 +152,10 @@ class CalculatorViewModel: ObservableObject {
                 }
                 if !endsWithNumber() {
                     infix_Expr.removeLast()
-                    displayNum.removeLast()
+                    displayExpr.removeLast()
                 }
                 infix_Expr.append("+")
-                displayNum += "+"
+                displayExpr += "+"
                 newNumInput = true
             }
         }
@@ -153,10 +166,10 @@ class CalculatorViewModel: ObservableObject {
                 }
                 if !endsWithNumber() {
                     infix_Expr.removeLast()
-                    displayNum.removeLast()
+                    displayExpr.removeLast()
                 }
                 infix_Expr.append("-")
-                displayNum += "-"
+                displayExpr += "-"
                 newNumInput = true
             }
         }
@@ -167,10 +180,10 @@ class CalculatorViewModel: ObservableObject {
                 }
                 if !endsWithNumber() {
                     infix_Expr.removeLast()
-                    displayNum.removeLast()
+                    displayExpr.removeLast()
                 }
                 infix_Expr.append("*")
-                displayNum += "x"
+                displayExpr += "x"
                 newNumInput = true
             }
         }
@@ -181,10 +194,10 @@ class CalculatorViewModel: ObservableObject {
                 }
                 if !endsWithNumber() {
                     infix_Expr.removeLast()
-                    displayNum.removeLast()
+                    displayExpr.removeLast()
                 }
                 infix_Expr.append("/")
-                displayNum += "÷"
+                displayExpr += "÷"
                 newNumInput = true
             }
         }
@@ -201,22 +214,19 @@ class CalculatorViewModel: ObservableObject {
                 return
             }
             newNumInput = true
-            history = displayNum
-            print(history)
-            displayNum = calculation()
-            infix_Expr = [displayNum]
+            history = displayExpr
+            displayExpr = calculation()
+            infix_Expr = [displayExpr]
+            setdisplayExprFmt()
         }
         else if button == .allClear {
-            displayNum = "0"
+            displayExpr = "0"
             isError = false
             newNumInput = true
             infix_Expr.removeAll()
         }
         else if button == .clear {
-            displayNum.removeLast()
-            if displayNum.isEmpty {
-                displayNum = "0"
-            }
+            displayExpr.removeLast()
             if !infix_Expr.isEmpty {
                 let last = infix_Expr.removeLast()
                 if let _num = Int(last) {    // 문자열이 Int 형변환이 되면
@@ -227,14 +237,24 @@ class CalculatorViewModel: ObservableObject {
                         infix_Expr.append(tmp)
                     }
                 }
+                displayExpr = infix_Expr.map { setNumberFmt(string: $0) }.joined()
+            }
+            if displayExpr.isEmpty {
+                displayExpr = "0"
+                newNumInput = true
             }
         }
         else if button == .dot {
             if isError {
-                displayNum = "0."
+                displayExpr = "0."
             }
-            else if !displayNum.contains(".") {
-                displayNum += "."
+            else if !displayExpr.contains(".") {
+                displayExpr += "."
+            }
+        }
+        else if button == .oppo {
+            if !isError {
+                // 값의 부호를 변경하는 코드
             }
         }
         else if button == .lbrac {
@@ -264,11 +284,6 @@ class CalculatorViewModel: ObservableObject {
         }
         else if button == .mr {
             // 메모리 리콜 처리
-        }
-        else if button == .oppo {
-            if !isError {
-                // 값의 부호를 변경하는 코드
-            }
         }
         else if button == .perc {
             if !isError {
@@ -355,26 +370,29 @@ class CalculatorViewModel: ObservableObject {
                 if isError {
                     newNumInput = false
                     infix_Expr = [num]
-                    displayNum = num
+                    displayExpr = num
                 }
-                else if newNumInput {
-                    newNumInput = false
+                else if infix_Expr.isEmpty {
                     infix_Expr.append(num)
-                    if displayNum == "0" && num == "0" {
-                        newNumInput = true
-                        infix_Expr.removeAll()
-                        displayNum = "0"
-                    }
-                    else if displayNum == "0" {
-                        displayNum = num
-                    }
-                    else {
-                        displayNum += num
-                    }
+                    displayExpr = num
                 }
                 else {
-                    infix_Expr[infix_Expr.count - 1] += num
-                    displayNum += num
+                    if let intValue = Int(infix_Expr.last!) {  //  수식이 숫자로 끝났을 때
+                        if intValue == 0 {
+                            infix_Expr.removeLast()
+                            if num != "0" {
+                                infix_Expr.append(num)
+                            }
+                        }
+                        else {
+                            infix_Expr[infix_Expr.count - 1] += num
+                        }
+                    }
+                    else {
+                        infix_Expr.append(num)
+                    }
+                    // 여기 밑에 infix_Expr 내용을 기반으로 displayExpr 내용을 재구성
+                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }.joined()
                 }
             }
         }
@@ -384,7 +402,7 @@ class CalculatorViewModel: ObservableObject {
             currentAC = true
         }
         else if button == .clear {
-            if displayNum == "0" || isError {
+            if displayExpr == "0" || isError {
                 currentAC = true
             }
         }
