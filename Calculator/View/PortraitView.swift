@@ -12,19 +12,26 @@ struct PortraitView: View {
     @EnvironmentObject var viewModel: CalculatorViewModel
     @Binding var isScientific: Bool
     @State private var btnData: [[BtnType]] = []
-    let WIDTH = iPhonePointRes.currentDeviceWidth() ?? 0
-    let HEIGHT = iPhonePointRes.currentDeviceHeight() ?? 0
+    private let WIDTH = iPhonePointRes.currentDeviceWidth() ?? 0
+    private let HEIGHT = iPhonePointRes.currentDeviceHeight() ?? 0
     
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            VStack(alignment: .trailing, spacing: 0){
+            VStack(alignment: .trailing, spacing: 0) {
                 Spacer()
-                Text(viewModel.displayNum)
-                    .font(.system(size: isScientific ? (HEIGHT * 2) / (3 * 10) : WIDTH / 4, weight: .regular))
-                    .foregroundColor(Color.white)
-                    .minimumScaleFactor(0.65)
+                Text(viewModel.history)
+                    .font(.system(size: 60))
+                    .foregroundColor(Color.gray)
+                    .minimumScaleFactor(0.1)
                     .lineLimit(1)
+                Text(viewModel.displayExpr)
+                    .font(.system(size: 80))
+                    .foregroundColor(Color.white)
+                    .minimumScaleFactor(0.1)
+                    .lineLimit(1)
+                    .border(Color.white)
+                
                 VStack {
                     ForEach(btnData, id: \.self) { col in
                         HStack {
@@ -51,7 +58,7 @@ struct PortraitView: View {
             btnData = isScientific ? scientificBtn + portraitBtn : portraitBtn
             btnData[isScientific ? 5 : 0][0] = viewModel.currentAC ? .allClear : .clear
         }
-        .onChange(of: viewModel.currentAC) { newValue in
+        .onChange(of: viewModel.currentAC) { newValue in // iOS 17 이상 문법
             if newValue {
                 btnData[isScientific ? 5 : 0][0] = .allClear
             }
