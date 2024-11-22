@@ -8,12 +8,15 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
-    @Published var history = "" // 회색으로 나타나는 기존 계산식
+    @Published var history: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
-    @Published var displayExpr:String = "0"  //  화면에 보여지는 수(흰색)
+    @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
     private var newNumInput = true // 새로운 숫자가 입력되는지
+    var isEmpty: Bool {
+        return infix_Expr.isEmpty
+    }
     
     // 연산자 우선순위
     private func priority(_ op: String) -> Int {
@@ -23,7 +26,7 @@ class CalculatorViewModel: ObservableObject {
         if op == "+" || op == "-"{
             return 1
         }
-        if op == "*" || op == "/"{
+        if op == "×" || op == "÷"{
             return 2
         }
         return -1
@@ -32,7 +35,7 @@ class CalculatorViewModel: ObservableObject {
     // 입력된 식의 마지막이 숫자인지 판별
     private func endsWithNumber() -> Bool {
         let last = infix_Expr.last
-        if last == nil || (last != "+" && last != "-" && last != "*" && last != "/"){
+        if last == nil || (last != "+" && last != "-" && last != "×" && last != "÷" && last != "(" && last != ")"){
             return true
         }
         return false
@@ -42,8 +45,8 @@ class CalculatorViewModel: ObservableObject {
     private func infix_Postfix() -> [String] {
        var postfix:[String] = []
        var stack:[String] = []
-        for i in infix_Expr{
-            if i == "+" || i == "-" || i == "*" || i == "/" {
+        for i in infix_Expr {
+            if i == "+" || i == "-" || i == "×" || i == "÷" {
                 while !stack.isEmpty && (priority(i) <= priority(stack.last!)){
                     postfix.append(stack.popLast()!)
                 }
@@ -70,11 +73,11 @@ class CalculatorViewModel: ObservableObject {
     }
     
     //변경된 후위표기 식을 스택을 통해 계산
-    private func calculation() -> String {
+    private func calculation() -> [String] {
        let postfix = infix_Postfix()
        var stack:[String] = []
         for i in postfix{
-            if i != "+" && i != "-" && i != "*" && i != "/" {
+            if i != "+" && i != "-" && i != "×" && i != "÷" {
                 stack.append(i)
             }
             else {
@@ -85,16 +88,16 @@ class CalculatorViewModel: ObservableObject {
                     else if i == "-" {
                         stack.append((NSDecimalNumber(string: num1).subtracting(NSDecimalNumber(string: num2))).stringValue)
                     }
-                    else if i == "*" {
+                    else if i == "×" {
                         stack.append((NSDecimalNumber(string: num1).multiplying(by: NSDecimalNumber(string: num2))).stringValue)
                     }
-                    else if i == "/" {
+                    else if i == "÷" {
                         if num2 != "0" {
                             stack.append((NSDecimalNumber(string: num1).dividing(by: NSDecimalNumber(string: num2))).stringValue)
                         }
                         else{   // 0으로 나누는 예외처리
                             isError = true
-                            return "정의되지 않음"
+                            return ["정의되지 않음"]
                         }
                     }
                 }
@@ -105,7 +108,7 @@ class CalculatorViewModel: ObservableObject {
                 }
             }
         }
-        return stack.removeLast()
+        return [stack.removeLast()]
     }
     
     private func bracketCorrection() -> Bool { // 괄호 쌍이 안맞을 때
@@ -139,10 +142,24 @@ class CalculatorViewModel: ObservableObject {
     private func setdisplayExprFmt() {
         let fmt = NumberFormatter()
         fmt.numberStyle = .decimal
-        if let intValue = Int(displayExpr), let stringValue = fmt.string(from: NSNumber(value: intValue)) {
-            displayExpr = stringValue
+        if  let last = displayExpr.last,
+            let intValue = Int(last),
+            let stringValue = fmt.string(from: NSNumber(value: intValue)) {
+            displayExpr = [stringValue]
         }
     }
+    
+    private func isRawExpr() -> Bool {
+        return !infix_Expr.contains {
+            ["+", "-", "×", "÷"].contains($0)
+        }
+    }
+    
+    func isContains(string: String) -> Bool {
+        let stringValue = string.replacingOccurrences(of: ",", with: "")
+        return infix_Expr.contains(stringValue)
+    }
+
     
     func handleButtonPress(_ button: BtnType) {
         if button == .add {
@@ -155,7 +172,7 @@ class CalculatorViewModel: ObservableObject {
                     displayExpr.removeLast()
                 }
                 infix_Expr.append("+")
-                displayExpr += "+"
+                displayExpr.append("+")
                 newNumInput = true
             }
         }
@@ -169,7 +186,7 @@ class CalculatorViewModel: ObservableObject {
                     displayExpr.removeLast()
                 }
                 infix_Expr.append("-")
-                displayExpr += "-"
+                displayExpr.append("-")
                 newNumInput = true
             }
         }
@@ -182,8 +199,8 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr.removeLast()
                     displayExpr.removeLast()
                 }
-                infix_Expr.append("*")
-                displayExpr += "x"
+                infix_Expr.append("×")
+                displayExpr.append("×")
                 newNumInput = true
             }
         }
@@ -196,8 +213,8 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr.removeLast()
                     displayExpr.removeLast()
                 }
-                infix_Expr.append("/")
-                displayExpr += "÷"
+                infix_Expr.append("÷")
+                displayExpr.append("÷")
                 newNumInput = true
             }
         }
@@ -210,20 +227,22 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr += Array(repeating: ")", count: bracGap)
                 }
             }
-            if infix_Expr.isEmpty {
+            if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
             newNumInput = true
-            history = displayExpr
             displayExpr = calculation()
-            infix_Expr = [displayExpr]
+            history = displayExpr
+            currentAC = true
+            infix_Expr = displayExpr
             setdisplayExprFmt()
         }
         else if button == .allClear {
-            displayExpr = "0"
+            displayExpr = ["0"]
             isError = false
             newNumInput = true
             infix_Expr.removeAll()
+            history.removeAll()
         }
         else if button == .clear {
             displayExpr.removeLast()
@@ -236,31 +255,56 @@ class CalculatorViewModel: ObservableObject {
                         let tmp = String(num[..<index])
                         infix_Expr.append(tmp)
                     }
+                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }
                 }
-                displayExpr = infix_Expr.map { setNumberFmt(string: $0) }.joined()
             }
             if displayExpr.isEmpty {
-                displayExpr = "0"
+                displayExpr = ["0"]
                 newNumInput = true
             }
         }
         else if button == .dot {
             if isError {
-                displayExpr = "0."
+                displayExpr = ["0."]
             }
             else if !displayExpr.contains(".") {
-                displayExpr += "."
+                displayExpr.append(".")
             }
         }
         else if button == .oppo {
             if !isError {
-                // 값의 부호를 변경하는 코드
+                if displayExpr != ["0"] { //  0일때는 동작 안함
+                    if endsWithNumber() {   //  수식이 숫자로 끝날 시
+                        if let num = infix_Expr.popLast() {  //  endsWithNumber()가 infix_Expr이 비어있을 시 nil 반환
+                            if let op = infix_Expr.last, op == "-" { // 마지막 연산자가 - 일 경우에는 +로 자동 변경
+                                infix_Expr[infix_Expr.endIndex - 1] = "+"
+                                infix_Expr.append(num)
+                            }
+                            else {
+                                infix_Expr.append("(")  //  괄호쌍은 숫자와 분리해야 함
+                                infix_Expr.append("-\(num)")
+                                infix_Expr.append(")")
+                            }
+                        }
+                    }
+                    else if infix_Expr.last == ")" { // 닫히는 괄호일 시
+                        infix_Expr.removeLast()
+                        let num = String(infix_Expr.removeLast().dropFirst())
+                        infix_Expr[infix_Expr.endIndex - 1] = num
+                    }
+                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }
+                }
+            }
+        }
+        else if button == .perc {
+            if !isError {
+                
             }
         }
         else if button == .lbrac {
             if !isError {
                 if endsWithNumber() && !infix_Expr.isEmpty {
-                    infix_Expr.append("*")
+                    infix_Expr.append("×")
                 }
                 infix_Expr.append("(")
             }
@@ -268,7 +312,7 @@ class CalculatorViewModel: ObservableObject {
         else if button == .rbrac {
             if !isError {
                 if endsWithNumber() && !infix_Expr.isEmpty {
-                    infix_Expr.append("*")
+                    infix_Expr.append("×")
                 }
                 infix_Expr.append(")")
             }
@@ -284,11 +328,6 @@ class CalculatorViewModel: ObservableObject {
         }
         else if button == .mr {
             // 메모리 리콜 처리
-        }
-        else if button == .perc {
-            if !isError {
-                // 백분율 계산 처리
-            }
         }
         else if button == ._2nd {
             // 2차 기능 처리
@@ -370,14 +409,10 @@ class CalculatorViewModel: ObservableObject {
                 if isError {
                     newNumInput = false
                     infix_Expr = [num]
-                    displayExpr = num
+                    displayExpr = [num]
                 }
-                else if infix_Expr.isEmpty {
-                    infix_Expr.append(num)
-                    displayExpr = num
-                }
-                else {
-                    if let intValue = Int(infix_Expr.last!) {  //  수식이 숫자로 끝났을 때
+                else if let last = infix_Expr.last {
+                    if let intValue = Int(last) {  //  수식이 숫자로 끝났을 때
                         if intValue == 0 {
                             infix_Expr.removeLast()
                             if num != "0" {
@@ -389,24 +424,33 @@ class CalculatorViewModel: ObservableObject {
                         }
                     }
                     else {
-                        infix_Expr.append(num)
+                        if bracketCorrection() {
+                            infix_Expr.append(num)
+                        }
+                        else {
+                            infix_Expr[infix_Expr.endIndex - 1] = num
+                            infix_Expr.append(")")
+                        }
                     }
-                    // 여기 밑에 infix_Expr 내용을 기반으로 displayExpr 내용을 재구성
-                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }.joined()
+                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }
+                }
+                else {
+                    infix_Expr.append(num)
+                    displayExpr = [num]
                 }
             }
         }
         
         // 아래 조건문들은 위에 있는 조건문들에 다 일일이 쓰면 currentAC 관련 코드를 넣으면 더러워질 것 같아서 따로 빼놓음
-        if button == .equal || infix_Expr.isEmpty {
+        if infix_Expr.isEmpty {
             currentAC = true
         }
         else if button == .clear {
-            if displayExpr == "0" || isError {
+            if displayExpr == ["0"] || isError {
                 currentAC = true
             }
         }
-        else if button == .emoji {
+        else if button == .equal || button == .emoji {   // equal은 특수성 때문에 위쪽 조건문에서 처리했음
             // 이 경우엔 currentAC 값을 유지한다
         }
         else {
