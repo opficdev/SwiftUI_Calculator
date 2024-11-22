@@ -12,7 +12,7 @@ struct ContentView: View {
     @StateObject private var orientation = OrientationViewModel()
     @StateObject private var viewModel = CalculatorViewModel()
     @State private var sheetOn = false
-    @State private var isScientific = true //  후에 UserDefaults로 옮길 것
+    @State private var isScientific = false //  후에 UserDefaults로 옮길 것
     
     let ud = UserDefaults.standard
     
@@ -22,12 +22,15 @@ struct ContentView: View {
                 sheetOn = true
             }, label: {
                 Image(systemName: "list.bullet")
-                    .font(.system(size: 25))
+                    .font(.system(size: 22))
                     .foregroundColor(Color.orange)
             })
+            .padding()
             if orientation.isPortrait {
                 PortraitView(isScientific: $isScientific)
                     .environmentObject(viewModel)
+                    .padding()
+                    .padding(.bottom)
             }
             else {
                 
@@ -35,12 +38,12 @@ struct ContentView: View {
            
         }
         .sheet(isPresented: $sheetOn) {
-            
+            HistoryView()
+                .presentationDetents([.fraction(0.5), .large])
         }
         .background(Color.black)
     }
 }
-
 
 
 #Preview {
