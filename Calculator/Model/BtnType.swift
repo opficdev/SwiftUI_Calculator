@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 enum BtnType{
     case _1, _2, _3, _4, _5, _6, _7, _8, _9, _0
     case dot, equal, add, sub, mul, div
@@ -18,118 +19,118 @@ enum BtnType{
     case rad, sinh, cosh, tanh, pi, rand, deg
     case emoji
     
-    var BtnDisplay: button {
+    var BtnDisplay: CalcButton {
         switch self {
         case ._0:
-            return button(string: "0")
+            return CalcButton(string: "0")
         case ._1:
-            return button(string: "1")
+            return CalcButton(string: "1")
         case ._2:
-            return button(string: "2")
+            return CalcButton(string: "2")
         case ._3:
-            return button(string: "3")
+            return CalcButton(string: "3")
         case ._4:
-            return button(string: "4")
+            return CalcButton(string: "4")
         case ._5:
-            return button(string: "5")
+            return CalcButton(string: "5")
         case ._6:
-            return button(string: "6")
+            return CalcButton(string: "6")
         case ._7:
-            return button(string: "7")
+            return CalcButton(string: "7")
         case ._8:
-            return button(string: "8")
+            return CalcButton(string: "8")
         case ._9:
-            return button(string: "9")
+            return CalcButton(string: "9")
         case .dot:
-            return button(string: ".")
+            return CalcButton(string: ".")
         case .equal:
-            return button(image: "equal")
+            return CalcButton(image: "equal")
         case .add:
-            return button(image: "plus")
+            return CalcButton(string: "+", image: "plus")
         case .sub:
-            return button(image: "minus")
+            return CalcButton(string: "-", image: "minus")
         case .mul:
-            return button(image: "multiply")
+            return CalcButton(string: "×", image: "multiply")
         case .div:
-            return button(image: "divide")
+            return CalcButton(string: "÷", image: "divide")
         case .allClear:
-            return button(string: "AC")
+            return CalcButton(string: "AC")
         case .clear:
-            return button(image: "delete.backward")
+            return CalcButton(image: "delete.backward")
         case .oppo:
-            return button(image: "plus.forwardslash.minus")
+            return CalcButton(image: "plus.forwardslash.minus")
         case .perc:
-            return button(image: "percent")
+            return CalcButton(image: "percent")
         case .lbrac:
-            return button(string: "(")
+            return CalcButton(string: "(")
         case .rbrac:
-            return button(string: ")")
+            return CalcButton(string: ")")
         case .mc:
-            return button(string: "mc")
+            return CalcButton(string: "mc")
         case .m_add:
-            return button(string: "m+")
+            return CalcButton(string: "m+")
         case .m_sub:
-            return button(string: "m-")
+            return CalcButton(string: "m-")
         case .mr:
-            return button(string: "mr")
+            return CalcButton(string: "mr")
         case ._2nd:
-            return button(string: "2nd")
+            return CalcButton(string: "2nd")
         case .x2:
-            return button(string: "x²")
+            return CalcButton(string: "x²")
         case .x3:
-            return button(string: "x³")
+            return CalcButton(string: "x³")
         case .xy:
-            return button(string: "xʸ")
+            return CalcButton(string: "xʸ")
         case .ex:
-            return button(string: "𝑒ˣ")
+            return CalcButton(string: "𝑒ˣ")
         case .tenx:
-            return button(string: "10ˣ")
+            return CalcButton(string: "10ˣ")
         case .rev:
-            return button(string: "¹∕ｘ")
+            return CalcButton(string: "¹∕ｘ")
         case .x_2:
-            return button(string: "²√ⅹ")
+            return CalcButton(string: "²√ⅹ")
         case .x_3:
-            return button(string: "³√ⅹ")
+            return CalcButton(string: "³√ⅹ")
         case .x_y:
-            return button(string: "ʸ√ⅹ")
+            return CalcButton(string: "ʸ√ⅹ")
         case .ln:
-            return button(string: "ln")
+            return CalcButton(string: "ln")
         case .log10:
-            return button(string: "log₁₀")
+            return CalcButton(string: "log₁₀")
         case .xf:
-            return button(string: "x!")
+            return CalcButton(string: "x!")
         case .sin:
-            return button(string: "sin")
+            return CalcButton(string: "sin")
         case .cos:
-            return button(string: "cos")
+            return CalcButton(string: "cos")
         case .tan:
-            return button(string: "tan")
+            return CalcButton(string: "tan")
         case .e:
-            return button(string: "𝑒")
+            return CalcButton(string: "𝑒")
         case .EE:
-            return button(string: "EE")
+            return CalcButton(string: "EE")
         case .rad:
-            return button(string: "Rad")
+            return CalcButton(string: "Rad")
         case .sinh:
-            return button(string: "sinh")
+            return CalcButton(string: "sinh")
         case .cosh:
-            return button(string: "cosh")
+            return CalcButton(string: "cosh")
         case .tanh:
-            return button(string: "tanh")
+            return CalcButton(string: "tanh")
         case .pi:
-            return button(string: "π")
+            return CalcButton(string: "π")
         case .rand:
-            return button(string: "Rand")
+            return CalcButton(string: "Rand")
         case .deg:
-            return button(string: "Deg")
+            return CalcButton(string: "Deg")
         case .emoji:
-            return button(image: "circle.grid.3x3.fill") // 계산기 SF Symbols가 없음
+            return CalcButton(image: "circle.grid.3x3.fill") // 계산기 SF Symbols가 없음
         }
     }
     
     var backgroundColor: Color{
         switch self{
-        case ._0,._1,._2,._3,._4,._5,._6,._7,._8,._9,.dot:
+        case ._0,._1,._2,._3,._4,._5,._6,._7,._8,._9,.dot,.emoji:
             return Color("numBtn")
         case .allClear,.clear,.oppo,.perc:
             return Color.gray
@@ -152,7 +153,7 @@ enum BtnType{
     }
 }
 
-struct button {
+struct CalcButton: Equatable {
     let string: String?
     let image: Image?
     
@@ -160,7 +161,8 @@ struct button {
         self.string = string
         if let image = image {
             self.image = Image(systemName: image)
-        } else {
+        }
+        else {
             self.image = nil
         }
     }
