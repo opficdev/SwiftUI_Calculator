@@ -231,8 +231,8 @@ class CalculatorViewModel: ObservableObject {
                 return
             }
             newNumInput = true
-            displayExpr = calculation()
             history = displayExpr
+            displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
             setdisplayExprFmt()
