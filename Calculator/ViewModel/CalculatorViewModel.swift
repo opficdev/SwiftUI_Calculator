@@ -160,6 +160,22 @@ class CalculatorViewModel: ObservableObject {
         }
     }
     
+    private func formattedDateString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
+    }
+    
+    private func isToday(dateString: String) -> Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        
+        guard let inputDate = formatter.date(from: dateString) else { return false }
+        
+        let todayString = formattedDateString()
+        return formatter.string(from: inputDate) == todayString
+    }
+    
     func isContains(string: String) -> Bool {
         let stringValue = string.replacingOccurrences(of: ",", with: "")
         return infix_Expr.contains(stringValue)
@@ -241,6 +257,20 @@ class CalculatorViewModel: ObservableObject {
             currentAC = true
             infix_Expr = displayExpr
             setdisplayExprFmt()
+            
+            var historyDict: [String: [History]] = [:]
+  
+            if let savedData = UserDefaults.standard.data(forKey: "history"),
+               let decodedHistoryDict = try? JSONDecoder().decode([String: [History]].self, from: savedData) {
+                historyDict = decodedHistoryDict
+                historyDict[formattedDateString()]!.append(History(historyExpr: history.joined(), displayExpr: displayExpr.joined()))
+            }
+            else {
+                historyDict = [formattedDateString(): [History(historyExpr: history.joined(), displayExpr: displayExpr.joined())]]
+            }
+            if let encodedData = try? JSONEncoder().encode(historyDict) {
+                UserDefaults.standard.set(encodedData, forKey: "history")
+            }
         }
         else if button == .allClear {
             displayExpr = ["0"]
