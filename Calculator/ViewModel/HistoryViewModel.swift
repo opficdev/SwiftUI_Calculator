@@ -8,8 +8,8 @@
 import Foundation
 
 class HistoryViewModel: ObservableObject { // @AppStorage로 뷰마다 바인딩이 가능하지만 MVVM 패턴을 따르기 위해 UserDefaults 뷰모델 정의
-    private let defaults = UserDefaults.standard
-    var showSheet = false
+    @Published var defaults = UserDefaults.standard
+    @Published var showSheet = false
     
     init() {}
     

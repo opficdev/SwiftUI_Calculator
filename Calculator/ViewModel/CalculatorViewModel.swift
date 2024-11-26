@@ -8,6 +8,7 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
+    @ObservedObject var historyVM: HistoryViewModel
     @Published var history: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
@@ -16,6 +17,10 @@ class CalculatorViewModel: ObservableObject {
     private var newNumInput = true // 새로운 숫자가 입력되는지
     var isEmpty: Bool {
         return infix_Expr.isEmpty
+    }
+    
+    init(historyVM: HistoryViewModel) {
+        self.historyVM = historyVM
     }
     
     // 연산자 우선순위
