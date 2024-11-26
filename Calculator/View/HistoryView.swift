@@ -9,43 +9,40 @@ import SwiftUI
 
 struct HistoryView: View {
     @EnvironmentObject var viewModel: HistoryViewModel
-    @State private var testHistory: [History]? = [
-        History(historyExpr: "(-6)+5", displayExpr: "-1"),
-        History(historyExpr: "456×5", displayExpr: "2,280")
-    ]
     @State private var modifyHistory = false
     
     var body: some View {
         VStack(alignment: .trailing) {
             if !modifyHistory {
-                Text("완료")
-                    .fontWeight(.semibold)
-                    .foregroundColor(Color.orange)
-                    .padding()
-                    .onTapGesture {
-                        viewModel.showSheet = false
-                        print(viewModel.showSheet)
-                    }
+                Button(action: {
+                    viewModel.showSheet = false
+                }, label: {
+                    Text("완료")
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.orange)
+                        .padding()
+                })
             }
-            List {
-//                if let arr = history.array(forKey: "history") as? [History] {
-                if let arr = testHistory, !arr.isEmpty {
+            if let arr = viewModel.array(forKey: "history") as? [History], !arr.isEmpty {
+                List {
                     ForEach(arr, id: \.self) { element in
-                        VStack {
+                        VStack(alignment: .leading) {
                             Text(element.historyExpr)
-                                .font(.system(size: 10))
+                                .font(.system(size: 16))
                                 .foregroundColor(Color.gray)
                             Text(element.displayExpr)
-                                .font(.system(size: 16))
+                                .font(.system(size: 20))
                                 .foregroundColor(Color.white)
                         }
                     }
+                    .listRowBackground(Color.clear)
                 }
-                else { // 기록 없음
-                    
-                }
+                .border(Color.white)
+                .scrollContentBackground(.hidden)
             }
-            .background(Color.deepGray)
+            else { // 기록 없음
+                
+            }
         }
         .background(Color.deepGray)
         .tabItem {
