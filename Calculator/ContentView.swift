@@ -10,8 +10,8 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var orientation = OrientationViewModel()
-    @StateObject private var calcViewModel = CalculatorViewModel()
-    @StateObject private var historyViewModel = HistoryViewModel()
+    @StateObject private var historyVM = HistoryViewModel()
+    @StateObject private var calcVM = CalculatorViewModel(historyVM: HistoryViewModel())
 //    @State private var sheetOn = false
     @State private var isScientific = false //  후에 UserDefaults로 옮길 것
     
@@ -20,7 +20,7 @@ struct ContentView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Button(action: {
-                historyViewModel.showSheet = true
+                historyVM.showSheet = true
             }, label: {
                 Image(systemName: "list.bullet")
                     .font(.system(size: 22))
@@ -29,7 +29,7 @@ struct ContentView: View {
             .padding()
             if orientation.isPortrait {
                 PortraitView(isScientific: $isScientific)
-                    .environmentObject(calcViewModel)
+                    .environmentObject(calcVM)
                     .padding()
                     .padding(.bottom)
             }
@@ -38,9 +38,9 @@ struct ContentView: View {
             }
            
         }
-        .sheet(isPresented: $historyViewModel.showSheet) {
+        .sheet(isPresented: $historyVM.showSheet) {
             HistoryView()
-                .environmentObject(historyViewModel)
+                .environmentObject(historyVM)
                 .presentationDetents([.fraction(0.5), .large])
                 .presentationDragIndicator(.visible)
         }
