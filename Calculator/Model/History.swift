@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct History: Hashable {
+struct History: Hashable, Codable {
     let historyExpr: String
     let displayExpr: String
 }
