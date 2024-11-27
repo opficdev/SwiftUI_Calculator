@@ -8,19 +8,20 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
-    @ObservedObject var historyVM: HistoryViewModel
     @Published var history: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
-    private var newNumInput = true // 새로운 숫자가 입력되는지
-    var isEmpty: Bool {
-        return infix_Expr.isEmpty
+    
+    private var today: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
     
-    init(historyVM: HistoryViewModel) {
-        self.historyVM = historyVM
+    var isEmpty: Bool {
+        return infix_Expr.isEmpty
     }
     
     // 연산자 우선순위
@@ -108,7 +109,6 @@ class CalculatorViewModel: ObservableObject {
                 }
                 else {
                     isError = true
-                    newNumInput = false
                     return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
                 }
             }
@@ -159,28 +159,13 @@ class CalculatorViewModel: ObservableObject {
             ["+", "-", "×", "÷"].contains($0)
         }
     }
+
     
-    private func formattedDateString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
-    }
-    
-    private func isToday(dateString: String) -> Bool {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        
-        guard let inputDate = formatter.date(from: dateString) else { return false }
-        
-        let todayString = formattedDateString()
-        return formatter.string(from: inputDate) == todayString
-    }
     
     func isContains(string: String) -> Bool {
         let stringValue = string.replacingOccurrences(of: ",", with: "")
         return infix_Expr.contains(stringValue)
     }
-
     
     func handleButtonPress(_ button: BtnType) {
         if button == .add {
@@ -194,7 +179,6 @@ class CalculatorViewModel: ObservableObject {
                 }
                 infix_Expr.append("+")
                 displayExpr.append("+")
-                newNumInput = true
             }
         }
         else if button == .sub {
@@ -208,7 +192,6 @@ class CalculatorViewModel: ObservableObject {
                 }
                 infix_Expr.append("-")
                 displayExpr.append("-")
-                newNumInput = true
             }
         }
         else if button == .mul {
@@ -222,7 +205,6 @@ class CalculatorViewModel: ObservableObject {
                 }
                 infix_Expr.append("×")
                 displayExpr.append("×")
-                newNumInput = true
             }
         }
         else if button == .div {
@@ -236,7 +218,6 @@ class CalculatorViewModel: ObservableObject {
                 }
                 infix_Expr.append("÷")
                 displayExpr.append("÷")
-                newNumInput = true
             }
         }
         else if button == .equal {
@@ -251,31 +232,34 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-            newNumInput = true
             history = displayExpr
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
             setdisplayExprFmt()
             
-            var historyDict: [String: [History]] = [:]
-  
-            if let savedData = UserDefaults.standard.data(forKey: "history"),
-               let decodedHistoryDict = try? JSONDecoder().decode([String: [History]].self, from: savedData) {
-                historyDict = decodedHistoryDict
-                historyDict[formattedDateString()]!.append(History(historyExpr: history.joined(), displayExpr: displayExpr.joined()))
+            var historyDict = [today: [History(historyExpr: history.joined(), displayExpr: displayExpr.joined())]]
+            if let data = UserDefaults.standard.data(forKey: today) {
+                if let decodeDict = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeDict[today] {
+                    historyDict[today] = historyDict[today]! + todayValue
+                }
             }
-            else {
-                historyDict = [formattedDateString(): [History(historyExpr: history.joined(), displayExpr: displayExpr.joined())]]
+            else {  //  저장되는 날짜만 따로 모으는 코드
+                if let arr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+                    UserDefaults.standard.set([today] + arr, forKey: "dateArr")
+                }
+                else {
+                    UserDefaults.standard.set([today], forKey: "dateArr")
+                }
             }
-            if let encodedData = try? JSONEncoder().encode(historyDict) {
-                UserDefaults.standard.set(encodedData, forKey: "history")
+            if let encodeDict = try? JSONEncoder().encode(historyDict) {
+                UserDefaults.standard.set(encodeDict, forKey: today)
             }
+            
         }
         else if button == .allClear {
             displayExpr = ["0"]
             isError = false
-            newNumInput = true
             infix_Expr.removeAll()
             history.removeAll()
         }
@@ -295,7 +279,6 @@ class CalculatorViewModel: ObservableObject {
             }
             if displayExpr.isEmpty {
                 displayExpr = ["0"]
-                newNumInput = true
             }
         }
         else if button == .dot {
@@ -442,7 +425,6 @@ class CalculatorViewModel: ObservableObject {
         else { //  숫자 버튼을 눌렀을 때
             if let num: String = button.BtnDisplay.string {
                 if isError {
-                    newNumInput = false
                     infix_Expr = [num]
                     displayExpr = [num]
                 }
@@ -453,6 +435,11 @@ class CalculatorViewModel: ObservableObject {
                             if num != "0" {
                                 infix_Expr.append(num)
                             }
+                        }
+                        else if currentAC {
+                            history.removeAll()
+                            infix_Expr = [num]
+                            displayExpr = [num]
                         }
                         else {
                             infix_Expr[infix_Expr.count - 1] += num
