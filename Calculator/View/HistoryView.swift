@@ -6,52 +6,89 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct HistoryView: View {
-    @EnvironmentObject var viewModel: HistoryViewModel
-    @State private var modifyHistory = false
+    @EnvironmentObject var historyVM: HistoryViewModel
+    
+    init() {
+        UIToolbar.appearance().barTintColor = UIColor(Color.elseBtn)
+    }
     
     var body: some View {
         VStack {
-            if !modifyHistory {
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        viewModel.showSheet = false
-                    }, label: {
-                        Text("완료")
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color.orange)
-                            .padding()
-                    })
+            HStack {
+                Spacer()
+                Button("완료") {
+                    historyVM.showSheet = false
                 }
+                .fontWeight(.semibold)
+                .foregroundColor(historyVM.modifyHistory ? Color.clear : Color.orange)
+                .padding([.top, .trailing])
             }
-            if let arr = UserDefaults.standard.array(forKey: "history") as? [History], !arr.isEmpty {
+            
+            if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String], !dateArr.isEmpty {
                 List {
-                    ForEach(arr, id: \.self) { element in
-                        VStack(alignment: .leading) {
-                            Text(element.historyExpr)
-                                .font(.system(size: 16))
+                    ForEach(dateArr, id: \.self) { dateString in
+                        if let arr = historyVM.historyData[dateString],
+                           let gap = historyVM.relativeDateString(for: dateString) {
+                            Text(gap)
                                 .foregroundColor(Color.gray)
-                            Text(element.displayExpr)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.white)
+                                .font(.headline)
+                            ForEach(arr.indices, id: \.self) { idx in
+                                HStack {
+                                    if historyVM.modifyHistory {
+                                        Button(action: {
+                                            historyVM.historyData[dateString]?[idx].CheckToggle()
+                                        }) {
+                                            if arr[idx].isChecked {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundColor(Color.orange)
+                                            }
+                                            else {
+                                                Image(systemName: "circle")
+                                                    .foregroundColor(Color.gray)
+                                            }
+                                        }
+                                        .padding([.trailing])
+                                    }
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text(arr[idx].historyExpr)
+                                            .font(.system(size: 16))
+                                            .foregroundColor(Color.gray)
+                                        Text(arr[idx].displayExpr)
+                                            .font(.system(size: 20))
+                                            .foregroundColor(Color.white)
+                                    }
+                                }
+                                .padding(.vertical)
+                            }
+                        }
+                        else {
+                            Color.clear.onAppear {
+                                if let data = UserDefaults.standard.data(forKey: dateString),
+                                   let dict = try? JSONDecoder().decode([String:[History]].self, from: data) {
+                                    historyVM.historyData = dict
+                                }
+                            }
                         }
                     }
                     .listRowBackground(Color.clear)
+                    .listRowSeparatorTint(Color.gray)
+                    
                 }
-                .border(Color.white)
-                .scrollContentBackground(.hidden)
+                .scrollContentBackground(.hidden) // 전체 List 배경 제거
+                .listStyle(PlainListStyle())
+                
             }
             else {
                 Group {
                     VStack(spacing: 10) {
-                        Spacer()
                         Image(systemName: "clock")
                             .font(.system(size: 30))
                         Text("기록 없음")
                             .font(.system(size: 20))
-                        Spacer()
                     }
                 }
                 .foregroundColor(Color.gray)
@@ -59,28 +96,36 @@ struct HistoryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.deepGray)
-        .tabItem {
-            HStack {
-                if modifyHistory {
-                    Text("완료")
-                        .onTapGesture {
-                            modifyHistory = false
-                        }
-                    Spacer()
-                    Text("삭제")
-                }
-                else {
-                    Text("편집")
-                        .onTapGesture {
-                            modifyHistory = true
+        .toolbar {
+            ToolbarItem(placement: .bottomBar) {
+                HStack {
+                    if historyVM.modifyHistory {
+                        Button("완료") {
+                            historyVM.modifyHistory = false
                         }
                         .foregroundColor(Color.orange)
-                    Spacer()
-                    Text("지우기")
+                        Spacer()
+                        Button("삭제") {
+                            // 삭제 로직 처리
+                        }
                         .foregroundColor(Color.red)
+                        .disabled(true)
+                    }
+                    else {
+                        Button("편집") {
+                            historyVM.modifyHistory = true
+                        }
+                        .foregroundColor(Color.orange)
+                        Spacer()
+                        Button("지우기") {
+                            // 지우기 로직 처리
+                        }
+                        .foregroundColor(Color.red)
+                    }
                 }
             }
         }
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
