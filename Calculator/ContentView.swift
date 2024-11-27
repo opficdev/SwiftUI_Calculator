@@ -11,8 +11,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var orientation = OrientationViewModel()
     @StateObject private var historyVM = HistoryViewModel()
-    @StateObject private var calcVM = CalculatorViewModel(historyVM: HistoryViewModel())
-//    @State private var sheetOn = false
+    @StateObject private var calcVM = CalculatorViewModel()
     @State private var isScientific = false //  후에 UserDefaults로 옮길 것
     
     let ud = UserDefaults.standard
@@ -41,7 +40,7 @@ struct ContentView: View {
         .sheet(isPresented: $historyVM.showSheet) {
             HistoryView()
                 .environmentObject(historyVM)
-                .presentationDetents([.fraction(0.5), .large])
+                .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
         .background(Color.black)
