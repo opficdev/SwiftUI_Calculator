@@ -44,13 +44,15 @@ struct HistoryView: View {
                                             if arr[idx].isChecked {
                                                 Image(systemName: "checkmark.circle.fill")
                                                     .foregroundColor(Color.orange)
+                                                    .font(.title3)
                                             }
                                             else {
                                                 Image(systemName: "circle")
                                                     .foregroundColor(Color.gray)
+                                                    .font(.title3)
                                             }
                                         }
-                                        .padding([.trailing])
+                                        .padding(.trailing)
                                     }
                                     
                                     VStack(alignment: .leading) {
@@ -80,7 +82,40 @@ struct HistoryView: View {
                 }
                 .scrollContentBackground(.hidden) // 전체 List 배경 제거
                 .listStyle(PlainListStyle())
-                
+                .toolbar {
+                    ToolbarItem(placement: .bottomBar) {
+                        HStack {
+                            if historyVM.modifyHistory {
+                                Button(action: {
+                                    historyVM.modifyHistory = false
+                                }) {
+                                    Text("완료")
+                                        .foregroundColor(Color.orange)
+                                }
+                                Spacer()
+                                Button(role: .destructive, action: {
+                                    
+                                }, label: {
+                                    Text("삭제")
+                                })
+                            }
+                            else {
+                                Button("편집") {
+                                    historyVM.modifyHistory = true
+                                }
+                                .foregroundColor(Color.orange)
+                                Spacer()
+                                Button(action: {
+                                    historyVM.removeAll = true
+                                }) {
+                                    Text("지우기")
+                                        .foregroundColor(Color.red)
+                                }
+                            }
+                        }
+                    }
+                    
+                }
             }
             else {
                 Group {
@@ -96,35 +131,6 @@ struct HistoryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.deepGray)
-        .toolbar {
-            ToolbarItem(placement: .bottomBar) {
-                HStack {
-                    if historyVM.modifyHistory {
-                        Button("완료") {
-                            historyVM.modifyHistory = false
-                        }
-                        .foregroundColor(Color.orange)
-                        Spacer()
-                        Button("삭제") {
-                            // 삭제 로직 처리
-                        }
-                        .foregroundColor(Color.red)
-                        .disabled(true)
-                    }
-                    else {
-                        Button("편집") {
-                            historyVM.modifyHistory = true
-                        }
-                        .foregroundColor(Color.orange)
-                        Spacer()
-                        Button("지우기") {
-                            // 지우기 로직 처리
-                        }
-                        .foregroundColor(Color.red)
-                    }
-                }
-            }
-        }
         .edgesIgnoringSafeArea(.bottom)
     }
 }
