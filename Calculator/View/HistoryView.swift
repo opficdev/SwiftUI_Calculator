@@ -83,41 +83,43 @@ struct HistoryView: View {
                 .scrollContentBackground(.hidden) // 전체 List 배경 제거
                 .listStyle(PlainListStyle())
                 .toolbar {
-                    ToolbarItem(placement: .bottomBar) {
-                        HStack {
-                            if historyVM.modifyHistory {
-                                Button(action: {
-                                    historyVM.modifyHistory = false
-                                }) {
-                                    Text("완료")
-                                        .foregroundColor(Color.orange)
+                    if !historyVM.historyData.isEmpty {
+                        ToolbarItem(placement: .bottomBar) {
+                            HStack {
+                                if historyVM.modifyHistory {
+                                    Button(action: {
+                                        historyVM.modifyHistory = false
+                                    }) {
+                                        Text("완료")
+                                            .foregroundColor(Color.orange)
+                                    }
+                                    Spacer()
+                                    Button(role: .destructive, action: {
+                                        
+                                    }, label: {
+                                        Text("삭제")
+                                    })
                                 }
-                                Spacer()
-                                Button(role: .destructive, action: {
-                                    
-                                }, label: {
-                                    Text("삭제")
-                                })
-                            }
-                            else {
-                                Button("편집") {
-                                    historyVM.modifyHistory = true
-                                }
-                                .foregroundColor(Color.orange)
-                                Spacer()
-                                Button(action: {
-                                    historyVM.removeAll = true
-                                }) {
-                                    Text("지우기")
-                                        .foregroundColor(Color.red)
+                                else {
+                                    Button("편집") {
+                                        historyVM.modifyHistory = true
+                                    }
+                                    .foregroundColor(Color.orange)
+                                    Spacer()
+                                    Button(action: {
+                                        historyVM.removeAll = true
+                                    }) {
+                                        Text("지우기")
+                                            .foregroundColor(Color.red)
+                                    }
                                 }
                             }
                         }
                     }
-                    
                 }
             }
             else {
+                Spacer()
                 Group {
                     VStack(spacing: 10) {
                         Image(systemName: "clock")
@@ -127,6 +129,7 @@ struct HistoryView: View {
                     }
                 }
                 .foregroundColor(Color.gray)
+                Spacer()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
