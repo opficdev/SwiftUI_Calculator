@@ -16,6 +16,14 @@ struct ContentView: View {
     
     let ud = UserDefaults.standard
     
+    init() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            windowScene.windows.forEach { window in
+                window.overrideUserInterfaceStyle = .dark
+            }
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Button(action: {
@@ -32,7 +40,7 @@ struct ContentView: View {
                     .padding()
                     .padding(.bottom)
             }
-            else {
+            else {  //가로모드
                 
             }
            
