@@ -33,4 +33,14 @@ class HistoryViewModel: ObservableObject {
         }
         return nil
     }
+    
+    func removeAllHistory() {
+        if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+            for dateString in dateArr {
+                UserDefaults.standard.removeObject(forKey: dateString)
+            }
+        }
+        UserDefaults.standard.removeObject(forKey: "dateArr")
+        historyData.removeAll()
+    }
 }

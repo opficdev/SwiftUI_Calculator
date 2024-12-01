@@ -120,7 +120,7 @@ struct HistoryView: View {
                                     isPresented: $historyVM.removeAllAlert,
                                     titleVisibility: .visible) {
                     Button(role: .destructive) {
-                        
+                        historyVM.removeAllHistory()
                     } label: {
                         Text("기록 지우기")
                     }
