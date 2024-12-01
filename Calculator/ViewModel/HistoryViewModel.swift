@@ -10,8 +10,8 @@ import Foundation
 class HistoryViewModel: ObservableObject { 
     @Published var showSheet = false
     @Published var modifyHistory = false
-    @Published var removeAll = false
-    @Published var remove = false
+    @Published var removeAllAlert = false
+    @Published var removeAlert = false
     @Published var historyData: [String: [History]] = [:]
     
     var today: String {
