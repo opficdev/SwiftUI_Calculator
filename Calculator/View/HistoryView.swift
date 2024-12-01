@@ -11,10 +11,6 @@ import UIKit
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
     
-    init() {
-        UIToolbar.appearance().barTintColor = UIColor(Color.elseBtn)
-    }
-    
     var body: some View {
         VStack {
             HStack {
@@ -38,9 +34,9 @@ struct HistoryView: View {
                             ForEach(arr.indices, id: \.self) { idx in
                                 HStack {
                                     if historyVM.modifyHistory {
-                                        Button(action: {
+                                        Button {
                                             historyVM.historyData[dateString]?[idx].CheckToggle()
-                                        }) {
+                                        } label: {
                                             if arr[idx].isChecked {
                                                 Image(systemName: "checkmark.circle.fill")
                                                     .foregroundColor(Color.orange)
@@ -76,47 +72,61 @@ struct HistoryView: View {
                             }
                         }
                     }
-                    .listRowBackground(Color.clear)
                     .listRowSeparatorTint(Color.gray)
-                    
                 }
-                .scrollContentBackground(.hidden) // 전체 List 배경 제거
                 .listStyle(PlainListStyle())
                 .toolbar {
                     if !historyVM.historyData.isEmpty {
                         ToolbarItem(placement: .bottomBar) {
                             HStack {
                                 if historyVM.modifyHistory {
-                                    Button(action: {
+                                    Button {
                                         historyVM.modifyHistory = false
-                                    }) {
+                                    } label: {
                                         Text("완료")
                                             .foregroundColor(Color.orange)
                                     }
                                     Spacer()
-                                    Button(role: .destructive, action: {
-                                        
-                                    }, label: {
+                                    Button {
+                                        historyVM.removeAlert = true
+                                    } label: {
                                         Text("삭제")
-                                    })
+                                            .foregroundColor(.red)
+                                    }
                                 }
                                 else {
-                                    Button("편집") {
+                                    Button {
                                         historyVM.modifyHistory = true
+                                    } label: {
+                                        Text("편집")
+                                            .foregroundColor(Color.orange)
                                     }
-                                    .foregroundColor(Color.orange)
                                     Spacer()
-                                    Button(action: {
-                                        historyVM.removeAll = true
-                                    }) {
+                                    Button {
+                                        historyVM.removeAllAlert = true
+                                    } label: {
                                         Text("지우기")
-                                            .foregroundColor(Color.red)
+                                            .foregroundColor(.red)
                                     }
                                 }
                             }
                         }
                     }
                 }
+                .confirmationDialog("title", isPresented: $historyVM.removeAlert) {
+                    
+                }
+                .confirmationDialog("모든 계산이 삭제됩니다. 이 동작은 취소할 수 없습니다.",
+                                    isPresented: $historyVM.removeAllAlert,
+                                    titleVisibility: .visible) {
+                    Button(role: .destructive) {
+                        
+                    } label: {
+                        Text("기록 지우기")
+                    }
+
+                }
+                                    
             }
             else {
                 Spacer()
