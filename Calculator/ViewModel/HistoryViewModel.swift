@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
 
 class HistoryViewModel: ObservableObject { 
     @Published var showSheet = false
@@ -13,6 +15,31 @@ class HistoryViewModel: ObservableObject {
     @Published var removeAllAlert = false
     @Published var removeAlert = false
     @Published var historyData: [String: [History]] = [:]
+    
+    private let disposeBag = DisposeBag()
+    // BehaviorRelay (RxSwift 데이터 흐름 관리용)
+    private let historyDataRelay = BehaviorRelay<[String: [History]]>(value: [:])
+    
+    init() {
+        NotificationCenter.default.rx.notification(UserDefaults.didChangeNotification)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+
+                if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+                    for dateString in dateArr {
+                        if let data = UserDefaults.standard.data(forKey: dateString),
+                           let decodedData = try? JSONDecoder().decode([String: [History]].self, from: data) {
+                            DispatchQueue.main.async {
+                                self.historyDataRelay.accept(decodedData)
+                                self.historyData = decodedData
+                            }
+                        }
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+    }
     
     var selectedCount: Int {
         return historyData.values.reduce(0) { count, historyItems in
@@ -45,15 +72,11 @@ class HistoryViewModel: ObservableObject {
             historyData[keyString] = historyData[keyString]!.filter { !$0.isChecked }
             if historyData[keyString]!.isEmpty {
                 UserDefaults.standard.removeObject(forKey: keyString)
-                if var dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+                if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
                     UserDefaults.standard.set(dateArr.filter { $0 != keyString}, forKey: "dateArr")
                 }
             }
         }
-        if let encodeDict = try? JSONEncoder().encode(historyData) {
-            UserDefaults.standard.set(encodeDict, forKey: today)
-        }
-        
     }
     
     func removeAllHistory() {
@@ -63,6 +86,5 @@ class HistoryViewModel: ObservableObject {
             }
         }
         UserDefaults.standard.removeObject(forKey: "dateArr")
-        historyData.removeAll()
     }
 }
