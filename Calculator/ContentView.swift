@@ -21,7 +21,7 @@ struct ContentView: View {
             windowScene.windows.forEach { window in
                 window.overrideUserInterfaceStyle = .dark
             }
-        }
+        }    
     }
     
     var body: some View {

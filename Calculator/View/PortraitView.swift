@@ -40,7 +40,6 @@ struct PortraitView: View {
                         }
                     }
                     .environment(\.layoutDirection, .rightToLeft)
-                    
                     .disabled(true)    //  조건은 생각해 봐야함
                     VStack {
                         ForEach(btnData, id: \.self) { col in
@@ -49,7 +48,7 @@ struct PortraitView: View {
                                     Button(action: {
                                         viewModel.handleButtonPress(button)
                                     }) {
-                                        ButtonLabelView(button: button.BtnDisplay)  // size는 16Pro 기준
+                                        ButtonLabelView(button: button.BtnDisplay)  // size는 16 Pro 기준
                                             .frame(width: geometry.size.width / CGFloat(col.count) - 8,   // 8은 .padding()의 기본값
                                                    height: isScientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 : geometry.size.width / CGFloat(col.count) - 8,
                                                    alignment: .center)

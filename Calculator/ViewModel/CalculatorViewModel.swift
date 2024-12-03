@@ -255,7 +255,6 @@ class CalculatorViewModel: ObservableObject {
             if let encodeDict = try? JSONEncoder().encode(historyDict) {
                 UserDefaults.standard.set(encodeDict, forKey: today)
             }
-            
         }
         else if button == .allClear {
             displayExpr = ["0"]
