@@ -154,7 +154,6 @@
 			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				ko,
 			);
 			mainGroup = DF4C1F512A7E9EBA005D6E7F;
