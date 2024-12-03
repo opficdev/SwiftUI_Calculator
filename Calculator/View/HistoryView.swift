@@ -63,14 +63,6 @@ struct HistoryView: View {
                                 .padding(.vertical)
                             }
                         }
-                        else {
-                            Color.clear.onAppear {
-                                if let data = UserDefaults.standard.data(forKey: dateString),
-                                   let dict = try? JSONDecoder().decode([String:[History]].self, from: data) {
-                                    historyVM.historyData = dict
-                                }
-                            }
-                        }
                     }
                     .listRowSeparatorTint(Color.gray)
                 }
@@ -91,8 +83,9 @@ struct HistoryView: View {
                                         historyVM.removeAlert = true
                                     } label: {
                                         Text("삭제")
-                                            .foregroundColor(.red)
+                                            .foregroundColor(historyVM.selectedCount == 0 ? Color.gray : Color.red)
                                     }
+                                    .disabled(historyVM.selectedCount == 0)
                                 }
                                 else {
                                     Button {
@@ -113,8 +106,14 @@ struct HistoryView: View {
                         }
                     }
                 }
-                .confirmationDialog("title", isPresented: $historyVM.removeAlert) {
-                    
+                .confirmationDialog("\(historyVM.selectedCount)개의 계산이 삭제됩니다. 이 동작은 취소할 수 없습니다",
+                                    isPresented: $historyVM.removeAlert,
+                                    titleVisibility: .visible) {
+                    Button(role: .destructive) {
+                        historyVM.removeHistory()
+                    } label: {
+                        Text("삭제")
+                    }
                 }
                 .confirmationDialog("모든 계산이 삭제됩니다. 이 동작은 취소할 수 없습니다.",
                                     isPresented: $historyVM.removeAllAlert,
@@ -126,7 +125,6 @@ struct HistoryView: View {
                     }
 
                 }
-                                    
             }
             else {
                 Spacer()
