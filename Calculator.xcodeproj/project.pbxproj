@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF0925582D008F7600168558 /* ShowTime in Frameworks */ = {isa = PBXBuildFile; productRef = DF0925572D008F7600168558 /* ShowTime */; };
 		DF3284342CDA5C3300786EB5 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = DF3284332CDA5C3300786EB5 /* RxCocoa */; };
 		DF3284362CDA5C3300786EB5 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = DF3284352CDA5C3300786EB5 /* RxRelay */; };
 		DF3284382CDA5C3300786EB5 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = DF3284372CDA5C3300786EB5 /* RxSwift */; };
@@ -50,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF0925582D008F7600168558 /* ShowTime in Frameworks */,
 				DF3284382CDA5C3300786EB5 /* RxSwift in Frameworks */,
 				DF3284362CDA5C3300786EB5 /* RxRelay in Frameworks */,
 				DF3284342CDA5C3300786EB5 /* RxCocoa in Frameworks */,
@@ -159,6 +161,7 @@
 			mainGroup = DF4C1F512A7E9EBA005D6E7F;
 			packageReferences = (
 				DF3284152CDA5B8100786EB5 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				DF0925562D008F7600168558 /* XCRemoteSwiftPackageReference "ShowTime" */,
 			);
 			productRefGroup = DF4C1F5B2A7E9EBA005D6E7F /* Products */;
 			projectDirPath = "";
@@ -418,6 +421,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		DF0925562D008F7600168558 /* XCRemoteSwiftPackageReference "ShowTime" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/KaneCheshire/ShowTime";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.3;
+			};
+		};
 		DF3284152CDA5B8100786EB5 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift";
@@ -429,6 +440,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DF0925572D008F7600168558 /* ShowTime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF0925562D008F7600168558 /* XCRemoteSwiftPackageReference "ShowTime" */;
+			productName = ShowTime;
+		};
 		DF3284332CDA5C3300786EB5 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DF3284152CDA5B8100786EB5 /* XCRemoteSwiftPackageReference "RxSwift" */;
