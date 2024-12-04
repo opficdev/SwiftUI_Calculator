@@ -21,6 +21,7 @@ class HistoryViewModel: ObservableObject {
     private let historyDataRelay = BehaviorRelay<[String: [History]]>(value: [:])
     
     init() {
+        //  UserDefaults의 변화를 HistoryData 변수에 즉시 동기화 시킴
         NotificationCenter.default.rx.notification(UserDefaults.didChangeNotification)
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
@@ -41,18 +42,21 @@ class HistoryViewModel: ObservableObject {
             .disposed(by: disposeBag)
     }
     
+    //  기록 수정 모드에서 선택된 기록의 갯수를 반환
     var selectedCount: Int {
         return historyData.values.reduce(0) { count, historyItems in
             count + historyItems.filter { $0.isChecked }.count
         }
     }
     
+    // 오늘 날짜를 yyyy-MM-dd 형식으로 반환
     var today: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: Date())
     }
     
+    // 날짜를 오늘, 어제 등 비교형으로 변환 후 반환
     func relativeDateString(for dateString: String) -> String? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -67,6 +71,7 @@ class HistoryViewModel: ObservableObject {
         return nil
     }
     
+    //  선택된 계산 기록들을 제거
     func removeHistory() {
         for keyString in historyData.keys {
             historyData[keyString] = historyData[keyString]!.filter { !$0.isChecked }
@@ -79,6 +84,7 @@ class HistoryViewModel: ObservableObject {
         }
     }
     
+    //  모든 계산 기록을 제거
     func removeAllHistory() {
         if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
             for dateString in dateArr {
@@ -86,5 +92,19 @@ class HistoryViewModel: ObservableObject {
             }
         }
         UserDefaults.standard.removeObject(forKey: "dateArr")
+    }
+    
+    //  선택 된 후 삭제하지 않았을 시 체크를 원복시켜주는 함수
+    func resetCheck() {
+        for keyString in historyData.keys {
+            if let items = historyData[keyString] {
+                historyData[keyString] = items.map { item in
+                    var newItem = item
+                    newItem.isChecked = false
+                    return newItem
+                }
+            }
+        }
+
     }
 }

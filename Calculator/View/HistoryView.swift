@@ -75,6 +75,7 @@ struct HistoryView: View {
                                 if historyVM.modifyHistory {
                                     Button {
                                         historyVM.modifyHistory = false
+                                        historyVM.resetCheck()
                                     } label: {
                                         Text("완료")
                                             .foregroundColor(Color.orange)
@@ -145,8 +146,9 @@ struct HistoryView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.deepGray)
         .edgesIgnoringSafeArea(.bottom)
-        .onAppear {
+        .onDisappear {
             historyVM.modifyHistory = false
+            historyVM.resetCheck()
         }
     }
 }
