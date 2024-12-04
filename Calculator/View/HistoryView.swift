@@ -10,6 +10,7 @@ import UIKit
 
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack {
@@ -21,60 +22,73 @@ struct HistoryView: View {
                 .fontWeight(.semibold)
                 .foregroundColor(historyVM.modifyHistory ? Color.clear : Color.orange)
                 .disabled(historyVM.modifyHistory)
-                .padding([.top, .trailing])
+                .padding()
             }
-            
             if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String], !dateArr.isEmpty {
-                List {
-                    ForEach(dateArr, id: \.self) { dateString in
-                        if let arr = historyVM.historyData[dateString],
-                           let gap = historyVM.relativeDateString(for: dateString) {
-                            Text(gap)
-                                .foregroundColor(Color.gray)
-                                .font(.headline)
-                            ForEach(arr.indices, id: \.self) { idx in
-                                HStack {
-                                    if historyVM.modifyHistory {
-                                        Button {
-                                            historyVM.historyData[dateString]?[idx].CheckToggle()
-                                        } label: {
-                                            if arr[idx].isChecked {
-                                                Image(systemName: "checkmark.circle.fill")
-                                                    .foregroundColor(Color.orange)
-                                                    .font(.title3)
+                LazyVStack {
+                    ScrollView {
+                        ForEach(dateArr, id: \.self) { dateString in
+                            if let arr = historyVM.historyData[dateString],
+                               let date = historyVM.relativeDateString(for: dateString) {
+                                LazyVStack(alignment: .leading, spacing: 0) {
+                                    Text(date)
+                                        .foregroundColor(Color.gray)
+                                        .font(.headline)
+                                        .padding(.bottom)
+                                    ForEach(arr.indices, id: \.self) { idx in
+                                        HStack(spacing: 0) {
+                                            if historyVM.modifyHistory {
+                                                Button {
+                                                    historyVM.historyData[dateString]?[idx].CheckToggle()
+                                                } label: {
+                                                    if arr[idx].isChecked {
+                                                        Image(systemName: "checkmark.circle.fill")
+                                                            .foregroundColor(Color.orange)
+                                                            .font(.title3)
+                                                    }
+                                                    else {
+                                                        Image(systemName: "circle")
+                                                            .foregroundColor(Color.gray)
+                                                            .font(.title3)
+                                                    }
+                                                }
+                                                .transition(.move(edge: .leading))
+                                                .padding(.trailing)
                                             }
-                                            else {
-                                                Image(systemName: "circle")
+                                            VStack(alignment: .leading) {
+                                                Rectangle()
+                                                    .foregroundColor(.gray)
+                                                    .frame(height: 1)
+                                                    .padding(.bottom)
+                                                Text(arr[idx].historyExpr)
+                                                    .font(.system(size: 16))
                                                     .foregroundColor(Color.gray)
-                                                    .font(.title3)
+                                                Text(arr[idx].displayExpr)
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(Color.white)
+                                                Rectangle()
+                                                    .foregroundColor(idx == arr.count - 1 ? .gray : .clear)
+                                                    .frame(height: 1)
+                                                    .padding(.top)
                                             }
                                         }
-                                        .padding(.trailing)
                                     }
-                                    
-                                    VStack(alignment: .leading) {
-                                        Text(arr[idx].historyExpr)
-                                            .font(.system(size: 16))
-                                            .foregroundColor(Color.gray)
-                                        Text(arr[idx].displayExpr)
-                                            .font(.system(size: 20))
-                                            .foregroundColor(Color.white)
-                                    }
+                                    .animation(.easeInOut, value: historyVM.modifyHistory)
                                 }
-                                .padding(.vertical)
+                                .padding(.leading)
                             }
                         }
                     }
-                    .listRowSeparatorTint(Color.gray)
                 }
-                .listStyle(PlainListStyle())
                 .toolbar {
                     if !historyVM.historyData.isEmpty {
                         ToolbarItem(placement: .bottomBar) {
                             HStack {
                                 if historyVM.modifyHistory {
                                     Button {
-                                        historyVM.modifyHistory = false
+                                        withAnimation {
+                                            historyVM.modifyHistory = false
+                                        }
                                         historyVM.resetCheck()
                                     } label: {
                                         Text("완료")
@@ -91,7 +105,9 @@ struct HistoryView: View {
                                 }
                                 else {
                                     Button {
-                                        historyVM.modifyHistory = true
+                                        withAnimation {
+                                            historyVM.modifyHistory = true
+                                        }
                                     } label: {
                                         Text("편집")
                                             .foregroundColor(Color.orange)
@@ -128,6 +144,7 @@ struct HistoryView: View {
                     }
 
                 }
+                Spacer()
             }
             else {
                 Spacer()
