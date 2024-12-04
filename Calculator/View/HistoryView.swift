@@ -25,7 +25,7 @@ struct HistoryView: View {
                 .padding()
             }
             if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String], !dateArr.isEmpty {
-                LazyVStack {
+                VStack {
                     ScrollView {
                         ForEach(dateArr, id: \.self) { dateString in
                             if let arr = historyVM.historyData[dateString],
