@@ -74,13 +74,22 @@ class HistoryViewModel: ObservableObject {
     //  선택된 계산 기록들을 제거
     func removeHistory() {
         for keyString in historyData.keys {
-            historyData[keyString] = historyData[keyString]!.filter { !$0.isChecked }
-            if historyData[keyString]!.isEmpty {
+            let filterData = historyData[keyString]!.filter { !$0.isChecked }
+            
+            if filterData.isEmpty {
                 UserDefaults.standard.removeObject(forKey: keyString)
                 if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
                     UserDefaults.standard.set(dateArr.filter { $0 != keyString}, forKey: "dateArr")
                 }
             }
+            else if let encodeData = try? JSONEncoder().encode([keyString: filterData]) {
+                UserDefaults.standard.set(encodeData, forKey: keyString)
+            }
+        }
+        
+        if let dateArr = UserDefaults.standard.array(forKey: "dateArr"), dateArr.isEmpty {
+            modifyHistory = false
+            UserDefaults.standard.removeObject(forKey: "dateArr")
         }
     }
     
