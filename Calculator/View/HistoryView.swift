@@ -20,6 +20,7 @@ struct HistoryView: View {
                 }
                 .fontWeight(.semibold)
                 .foregroundColor(historyVM.modifyHistory ? Color.clear : Color.orange)
+                .disabled(historyVM.modifyHistory)
                 .padding([.top, .trailing])
             }
             
@@ -120,6 +121,7 @@ struct HistoryView: View {
                                     titleVisibility: .visible) {
                     Button(role: .destructive) {
                         historyVM.removeAllHistory()
+                        historyVM.modifyHistory = false
                     } label: {
                         Text("기록 지우기")
                     }
@@ -143,6 +145,9 @@ struct HistoryView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.deepGray)
         .edgesIgnoringSafeArea(.bottom)
+        .onAppear {
+            historyVM.modifyHistory = false
+        }
     }
 }
 
