@@ -238,10 +238,10 @@ class CalculatorViewModel: ObservableObject {
             infix_Expr = displayExpr
             setdisplayExprFmt()
             
-            var historyDict = [today: [History(historyExpr: history.joined(), displayExpr: displayExpr.joined())]]
+            var historyData = [today: [History(historyExpr: history.joined(), displayExpr: displayExpr.joined())]]
             if let data = UserDefaults.standard.data(forKey: today) {
-                if let decodeDict = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeDict[today] {
-                    historyDict[today] = historyDict[today]! + todayValue
+                if let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeData[today] {
+                    historyData[today] = historyData[today]! + todayValue
                 }
             }
             else {  //  저장되는 날짜만 따로 모으는 코드
@@ -252,8 +252,8 @@ class CalculatorViewModel: ObservableObject {
                     UserDefaults.standard.set([today], forKey: "dateArr")
                 }
             }
-            if let encodeDict = try? JSONEncoder().encode(historyDict) {
-                UserDefaults.standard.set(encodeDict, forKey: today)
+            if let encodeData = try? JSONEncoder().encode(historyData) {
+                UserDefaults.standard.set(encodeData, forKey: today)
             }
         }
         else if button == .allClear {
