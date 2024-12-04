@@ -19,6 +19,7 @@ struct HistoryView: View {
                 Button("완료") {
                     historyVM.showSheet = false
                 }
+                .font(.title3)
                 .fontWeight(.semibold)
                 .foregroundColor(historyVM.modifyHistory ? Color.clear : Color.orange)
                 .disabled(historyVM.modifyHistory)
@@ -33,7 +34,7 @@ struct HistoryView: View {
                                 LazyVStack(alignment: .leading, spacing: 0) {
                                     Text(date)
                                         .foregroundColor(Color.gray)
-                                        .font(.headline)
+                                        .font(.title3)
                                         .padding(.bottom)
                                     ForEach(arr.indices, id: \.self) { idx in
                                         HStack(spacing: 0) {
@@ -52,30 +53,25 @@ struct HistoryView: View {
                                                             .font(.title3)
                                                     }
                                                 }
-                                                .transition(.move(edge: .leading))
+                                                .transition(AnyTransition.opacity.combined(with: .move(edge: .leading)))
                                                 .padding(.trailing)
                                             }
                                             VStack(alignment: .leading) {
-                                                Rectangle()
-                                                    .foregroundColor(.gray)
-                                                    .frame(height: 1)
+                                                Divider()
                                                     .padding(.bottom)
                                                 Text(arr[idx].historyExpr)
-                                                    .font(.system(size: 16))
                                                     .foregroundColor(Color.gray)
                                                 Text(arr[idx].displayExpr)
-                                                    .font(.system(size: 20))
+                                                    .font(.title3)
                                                     .foregroundColor(Color.white)
-                                                Rectangle()
-                                                    .foregroundColor(idx == arr.count - 1 ? .gray : .clear)
-                                                    .frame(height: 1)
+                                                Divider()
                                                     .padding(.top)
                                             }
                                         }
                                     }
-                                    .animation(.easeInOut, value: historyVM.modifyHistory)
+                                    .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
                                 }
-                                .padding(.leading)
+                                .padding([.top,.leading])
                             }
                         }
                     }
