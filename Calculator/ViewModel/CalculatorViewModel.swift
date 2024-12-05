@@ -8,7 +8,7 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
-    @Published var history: [String] = [] // 회색으로 나타나는 기존 계산식
+    @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
     private var infix_Expr:[String] = []  // 입력 식(중위)
@@ -232,13 +232,13 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-            history = displayExpr
+            historyExpr = displayExpr
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
             setdisplayExprFmt()
             
-            var historyData = [today: [History(historyExpr: history.joined(), displayExpr: displayExpr.joined())]]
+            var historyData = [today: [History(historyExpr: historyExpr, displayExpr: displayExpr)]]
             if let data = UserDefaults.standard.data(forKey: today) {
                 if let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeData[today] {
                     historyData[today] = historyData[today]! + todayValue
@@ -260,7 +260,7 @@ class CalculatorViewModel: ObservableObject {
             displayExpr = ["0"]
             isError = false
             infix_Expr.removeAll()
-            history.removeAll()
+            historyExpr.removeAll()
         }
         else if button == .clear {
             displayExpr.removeLast()
@@ -436,7 +436,7 @@ class CalculatorViewModel: ObservableObject {
                             }
                         }
                         else if currentAC {
-                            history.removeAll()
+                            historyExpr.removeAll()
                             infix_Expr = [num]
                             displayExpr = [num]
                         }
