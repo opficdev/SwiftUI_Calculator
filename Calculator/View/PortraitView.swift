@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 struct PortraitView: View {
-    @EnvironmentObject var viewModel: CalculatorViewModel
+    @EnvironmentObject var calcVM: CalculatorViewModel
     @Binding var isScientific: Bool
     @State private var btnData: [[BtnType]] = []
     
@@ -21,7 +21,7 @@ struct PortraitView: View {
                     Spacer()
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
-                            ForEach(viewModel.history.reversed(), id: \.self) { element in
+                            ForEach(calcVM.historyExpr.reversed(), id: \.self) { element in
                                 Text(element)
                                     .font(.system(size: 40))
                                     .foregroundColor(Color.gray)
@@ -32,10 +32,10 @@ struct PortraitView: View {
                     .disabled(true)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
-                            ForEach(viewModel.displayExpr.reversed(), id: \.self) { element in
+                            ForEach(calcVM.displayExpr.reversed(), id: \.self) { element in
                                 Text(element)
                                     .font(.system(size: 70))
-                                    .foregroundColor(viewModel.isEmpty || viewModel.isContains(string: element) ? Color.white : Color.gray)
+                                    .foregroundColor(calcVM.isEmpty || calcVM.isContains(string: element) ? Color.white : Color.gray)
                             }
                         }
                     }
@@ -46,7 +46,7 @@ struct PortraitView: View {
                             HStack {
                                 ForEach(col, id: \.self) { button in
                                     Button(action: {
-                                        viewModel.handleButtonPress(button)
+                                        calcVM.handleButtonPress(button)
                                     }) {
                                         ButtonLabelView(button: button.BtnDisplay)  // size는 16 Pro 기준
                                             .frame(width: geometry.size.width / CGFloat(col.count) - 8,   // 8은 .padding()의 기본값
@@ -65,9 +65,9 @@ struct PortraitView: View {
             }
             .onAppear {
                 btnData = isScientific ? scientificBtn + portraitBtn : portraitBtn
-                btnData[isScientific ? 5 : 0][0] = viewModel.currentAC ? .allClear : .clear
+                btnData[isScientific ? 5 : 0][0] = calcVM.currentAC ? .allClear : .clear
             }
-            .onChange(of: viewModel.currentAC) { newValue in
+            .onChange(of: calcVM.currentAC) { newValue in
                 if newValue {
                     btnData[isScientific ? 5 : 0][0] = .allClear
                 }
