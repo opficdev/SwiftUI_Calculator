@@ -9,8 +9,8 @@ import Foundation
 
 struct History: Hashable, Codable {
     var isChecked = false
-    let historyExpr: String
-    let displayExpr: String
+    let historyExpr: [String]
+    let displayExpr: [String]
     
     mutating func CheckToggle() {
         isChecked.toggle()
