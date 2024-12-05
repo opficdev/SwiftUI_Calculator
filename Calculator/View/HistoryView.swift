@@ -59,9 +59,9 @@ struct HistoryView: View {
                                             VStack(alignment: .leading) {
                                                 Divider()
                                                     .padding(.bottom)
-                                                Text(arr[idx].historyExpr)
+                                                Text(arr[idx].historyExpr.joined())
                                                     .foregroundColor(Color.gray)
-                                                Text(arr[idx].displayExpr)
+                                                Text(arr[idx].displayExpr.joined())
                                                     .font(.title3)
                                                     .foregroundColor(Color.white)
                                                 Divider()
