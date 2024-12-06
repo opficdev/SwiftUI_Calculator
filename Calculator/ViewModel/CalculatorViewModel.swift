@@ -238,24 +238,32 @@ class CalculatorViewModel: ObservableObject {
             currentAC = true
             infix_Expr = displayExpr
             setdisplayExprFmt()
-            id = UUID()
             
-            var historyData = [today: [History(id: id, historyExpr: historyExpr, displayExpr: displayExpr)]]
-            if let data = UserDefaults.standard.data(forKey: today) {
-                if let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeData[today] {
-                    historyData[today] = historyData[today]! + todayValue
+            if !isError {
+                id = UUID()
+                
+                var historyData = [today: [History(id: id, historyExpr: historyExpr, displayExpr: displayExpr)]]
+                if let data = UserDefaults.standard.data(forKey: today) {
+                    if let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeData[today] {
+                        if let firstValue = todayValue.first, firstValue.historyExpr != historyData[today]!.first?.historyExpr {    //  마지막에 저장된 수식과 다를 경우만 새로 저장
+                            historyData[today] = historyData[today]! + todayValue
+                        }
+                        else {
+                            historyData[today] = todayValue
+                        }
+                    }
                 }
-            }
-            else {  //  저장되는 날짜만 따로 모으는 코드
-                if let arr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
-                    UserDefaults.standard.set([today] + arr, forKey: "dateArr")
+                else {  //  저장되는 날짜만 따로 모으는 코드
+                    if let arr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+                        UserDefaults.standard.set([today] + arr, forKey: "dateArr")
+                    }
+                    else {
+                        UserDefaults.standard.set([today], forKey: "dateArr")
+                    }
                 }
-                else {
-                    UserDefaults.standard.set([today], forKey: "dateArr")
+                if let encodeData = try? JSONEncoder().encode(historyData) {
+                    UserDefaults.standard.set(encodeData, forKey: today)
                 }
-            }
-            if let encodeData = try? JSONEncoder().encode(historyData) {
-                UserDefaults.standard.set(encodeData, forKey: today)
             }
         }
         else if button == .allClear {
@@ -428,6 +436,7 @@ class CalculatorViewModel: ObservableObject {
                 if isError {
                     infix_Expr = [num]
                     displayExpr = [num]
+                    isError = false //  새로운 계산 식이 시작이므로 다시 에러 플래그를 false로
                 }
                 else if let last = infix_Expr.last {
                     if let intValue = Int(last) {  //  수식이 숫자로 끝났을 때
