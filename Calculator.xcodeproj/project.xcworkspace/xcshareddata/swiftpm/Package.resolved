@@ -1,5 +1,5 @@
 {
-  "originHash" : "382b88cb3f66f515b44b3f76b370596c967293468006dd8c51b24c67000f0efb",
+  "originHash" : "17ad69a9d62bb5214561f4b13adc77420e1190aa388f7c14a5057af4cc73b509",
   "pins" : [
     {
       "identity" : "rxswift",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "c7c7d2cf50a3211fe2843f76869c698e4e417930",
         "version" : "6.8.0"
-      }
-    },
-    {
-      "identity" : "showtime",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/KaneCheshire/ShowTime",
-      "state" : {
-        "revision" : "f4e976931fc5f9b7a7d011f40c62a250c4ff53ab",
-        "version" : "2.5.3"
       }
     }
   ],

@@ -161,7 +161,6 @@
 			mainGroup = DF4C1F512A7E9EBA005D6E7F;
 			packageReferences = (
 				DF3284152CDA5B8100786EB5 /* XCRemoteSwiftPackageReference "RxSwift" */,
-				DF0925562D008F7600168558 /* XCRemoteSwiftPackageReference "ShowTime" */,
 			);
 			productRefGroup = DF4C1F5B2A7E9EBA005D6E7F /* Products */;
 			projectDirPath = "";
