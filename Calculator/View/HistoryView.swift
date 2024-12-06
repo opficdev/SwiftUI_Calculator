@@ -7,11 +7,13 @@
 
 import SwiftUI
 import UIKit
+import RxSwift
 
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
     @EnvironmentObject var calcVM: CalculatorViewModel
     @Environment(\.presentationMode) var presentationMode
+    private let disposeBag = DisposeBag()
     
     var body: some View {
         VStack {
@@ -79,12 +81,6 @@ struct HistoryView: View {
                                 }
                                 .padding(.top)
                             }
-                            else {
-                                Color.clear.onAppear {
-                                    //  디코딩 관련 에러가 발생해서 사용할 수 없는 데이터들이라 초기화
-                                    historyVM.removeAllHistory()
-                                }
-                            }
                         }
                     }
                 }
@@ -137,6 +133,15 @@ struct HistoryView: View {
                                     titleVisibility: .visible) {
                     Button(role: .destructive) {
                         historyVM.removeHistory()
+                            .subscribe(
+                                onCompleted: {
+                                    print(" 계산 기록 제거 완료")
+                                },
+                                onError: { error in
+                                    print("에러 발생: \(error.localizedDescription)")
+                                }
+                            )
+                            .disposed(by: disposeBag)
                     } label: {
                         Text("삭제")
                     }
@@ -146,6 +151,11 @@ struct HistoryView: View {
                                     titleVisibility: .visible) {
                     Button(role: .destructive) {
                         historyVM.removeAllHistory()
+                            .subscribe(
+                                onCompleted: { print("모든 계산 기록 제거 완료") },
+                                onError: { error in print("에러 발생: \(error)") }
+                            )
+                            .disposed(by: disposeBag)
                         historyVM.modifyHistory = false
                     } label: {
                         Text("기록 지우기")
