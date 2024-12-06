@@ -26,14 +26,13 @@ class HistoryViewModel: ObservableObject {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
-
                 if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
                     for dateString in dateArr {
                         if let data = UserDefaults.standard.data(forKey: dateString),
-                           let decodedData = try? JSONDecoder().decode([String: [History]].self, from: data) {
-                            DispatchQueue.main.async {
-                                self.historyDataRelay.accept(decodedData)
-                                self.historyData = decodedData
+                           let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data) {
+                               DispatchQueue.main.async {
+                                   self.historyDataRelay.accept(decodeData)
+                                   self.historyData = decodeData
                             }
                         }
                     }
