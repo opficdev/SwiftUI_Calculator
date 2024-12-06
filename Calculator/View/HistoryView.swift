@@ -10,6 +10,7 @@ import UIKit
 
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
+    @EnvironmentObject var calcVM: CalculatorViewModel
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -69,13 +70,20 @@ struct HistoryView: View {
                                             }
                                         }
                                         .padding(.leading)
-                                        .background(historyVM.modifyHistory && arr[idx].isChecked ? Color.gray.opacity(0.1) : Color.clear)
+                                        .background((historyVM.modifyHistory && arr[idx].isChecked) ||
+                                                    (!historyVM.modifyHistory && arr[idx].id == calcVM.id)
+                                                    ? Color.gray.opacity(0.1) : Color.clear)
                                         
                                     }
                                     .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
                                 }
-//                                .padding([.top,.leading])
                                 .padding(.top)
+                            }
+                            else {
+                                Color.clear.onAppear {
+                                    //  디코딩 관련 에러가 발생해서 사용할 수 없는 데이터들이라 초기화
+                                    historyVM.removeAllHistory()
+                                }
                             }
                         }
                     }
