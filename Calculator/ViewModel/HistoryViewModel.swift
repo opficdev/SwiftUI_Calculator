@@ -125,4 +125,15 @@ class HistoryViewModel: ObservableObject {
             }
         }
     }
+    
+    //  실수 형태의 문자열을 입력받아 소수점 4번째 자리에서 반올림한 값을 문자열로 반환하는 함수
+    func roundToFourth(for string: String) -> String {
+        guard let number = Double(string) else {
+            return string
+        }
+        
+        let roundedValue = round(number * 10000) / 10000 // 소수점 4번째 자리에서 반올림
+        return String(format: "%.3f", roundedValue) // 문자열로 반환
+    }
+
 }
