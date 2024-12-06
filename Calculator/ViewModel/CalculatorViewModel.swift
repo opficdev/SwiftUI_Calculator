@@ -11,6 +11,7 @@ class CalculatorViewModel: ObservableObject {
     @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
+    @Published var id = UUID()  //  현재 식에 설정되는 UUID
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
     
@@ -237,8 +238,9 @@ class CalculatorViewModel: ObservableObject {
             currentAC = true
             infix_Expr = displayExpr
             setdisplayExprFmt()
+            id = UUID()
             
-            var historyData = [today: [History(historyExpr: historyExpr, displayExpr: displayExpr)]]
+            var historyData = [today: [History(id: id, historyExpr: historyExpr, displayExpr: displayExpr)]]
             if let data = UserDefaults.standard.data(forKey: today) {
                 if let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeData[today] {
                     historyData[today] = historyData[today]! + todayValue
