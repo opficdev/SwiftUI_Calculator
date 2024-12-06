@@ -35,7 +35,7 @@ struct HistoryView: View {
                                     Text(date)
                                         .foregroundColor(Color.gray)
                                         .font(.title3)
-                                        .padding(.bottom)
+                                        .padding([.bottom, .leading])
                                     ForEach(arr.indices, id: \.self) { idx in
                                         HStack(spacing: 0) {
                                             if historyVM.modifyHistory {
@@ -68,10 +68,14 @@ struct HistoryView: View {
                                                     .padding(.top)
                                             }
                                         }
+                                        .padding(.leading)
+                                        .background(historyVM.modifyHistory && arr[idx].isChecked ? Color.gray.opacity(0.1) : Color.clear)
+                                        
                                     }
                                     .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
                                 }
-                                .padding([.top,.leading])
+//                                .padding([.top,.leading])
+                                .padding(.top)
                             }
                         }
                     }
