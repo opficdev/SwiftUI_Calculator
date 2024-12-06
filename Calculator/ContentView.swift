@@ -48,6 +48,7 @@ struct ContentView: View {
         .sheet(isPresented: $historyVM.showSheet) {
             HistoryView()
                 .environmentObject(historyVM)
+                .environmentObject(calcVM)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
