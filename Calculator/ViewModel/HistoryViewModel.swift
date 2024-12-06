@@ -71,60 +71,22 @@ class HistoryViewModel: ObservableObject {
     }
     
     //  선택된 계산 기록들을 제거
-//    func removeHistory() {
-//        for keyString in historyData.keys {
-//            let filterData = historyData[keyString]!.filter { !$0.isChecked }
-//            
-//            if filterData.isEmpty {
-//                UserDefaults.standard.removeObject(forKey: keyString)
-//                if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
-//                    UserDefaults.standard.set(dateArr.filter { $0 != keyString}, forKey: "dateArr")
-//                }
-//            }
-//            else if let encodeData = try? JSONEncoder().encode([keyString: filterData]) {
-//                UserDefaults.standard.set(encodeData, forKey: keyString)
-//            }
-//        }
-//        
-//        if let dateArr = UserDefaults.standard.array(forKey: "dateArr"), dateArr.isEmpty {
-//            modifyHistory = false
-//            UserDefaults.standard.removeObject(forKey: "dateArr")
-//        }
-//    }
-    
-//    //  모든 계산 기록을 제거
-//    func removeAllHistory() {
-//        if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
-//            for dateString in dateArr {
-//                UserDefaults.standard.removeObject(forKey: dateString)
-//            }
-//        }
-//        UserDefaults.standard.removeObject(forKey: "dateArr")
-//    }
-//
-    
     @discardableResult
     func removeHistory() -> Completable {
         return Completable.create { completable in
-            // historyData의 모든 key에 대해 처리
             for keyString in self.historyData.keys {
-                // 체크되지 않은 데이터 필터링
                 let filterData = self.historyData[keyString]!.filter { !$0.isChecked }
                 
                 if filterData.isEmpty {
-                    // 체크된 데이터만 남아있다면 삭제
                     UserDefaults.standard.removeObject(forKey: keyString)
                     if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
-                        // dateArr에서 해당 키 삭제
                         UserDefaults.standard.set(dateArr.filter { $0 != keyString }, forKey: "dateArr")
                     }
-                } else if let encodeData = try? JSONEncoder().encode([keyString: filterData]) {
-                    // 체크되지 않은 데이터 저장
+                }
+                else if let encodeData = try? JSONEncoder().encode([keyString: filterData]) {
                     UserDefaults.standard.set(encodeData, forKey: keyString)
                 }
             }
-            
-            // dateArr가 비어있는지 확인 후 삭제
             if let dateArr = UserDefaults.standard.array(forKey: "dateArr"), dateArr.isEmpty {
                 self.modifyHistory = false
                 UserDefaults.standard.removeObject(forKey: "dateArr")
@@ -136,6 +98,7 @@ class HistoryViewModel: ObservableObject {
         }
     }
     
+    //  모든 계산 기록을 제거
     @discardableResult
     func removeAllHistory() -> Completable {
         return Completable.create { completable in
