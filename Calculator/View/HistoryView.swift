@@ -12,7 +12,7 @@ import RxSwift
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
     @EnvironmentObject var calcVM: CalculatorViewModel
-    @Environment(\.presentationMode) var presentationMode
+
     private let disposeBag = DisposeBag()
     
     var body: some View {
@@ -75,7 +75,15 @@ struct HistoryView: View {
                                         .background((historyVM.modifyHistory && arr[idx].isChecked) ||
                                                     (!historyVM.modifyHistory && arr[idx].id == calcVM.id)
                                                     ? Color.gray.opacity(0.1) : Color.clear)
-                                        
+                                        .contentShape(Rectangle()) // HStack의 터치 영역 확장
+                                        .onTapGesture {
+                                            if !historyVM.modifyHistory {
+                                                calcVM.id = arr[idx].id
+                                                calcVM.historyExpr = arr[idx].historyExpr
+                                                calcVM.displayExpr = arr[idx].displayExpr
+                                                historyVM.showSheet = false
+                                            }
+                                        }
                                     }
                                     .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
                                 }
@@ -134,9 +142,7 @@ struct HistoryView: View {
                     Button(role: .destructive) {
                         historyVM.removeHistory()
                             .subscribe(
-                                onCompleted: {
-                                    print(" 계산 기록 제거 완료")
-                                },
+                                onCompleted: {},
                                 onError: { error in
                                     print("에러 발생: \(error.localizedDescription)")
                                 }
@@ -152,7 +158,7 @@ struct HistoryView: View {
                     Button(role: .destructive) {
                         historyVM.removeAllHistory()
                             .subscribe(
-                                onCompleted: { print("모든 계산 기록 제거 완료") },
+                                onCompleted: {},
                                 onError: { error in print("에러 발생: \(error)") }
                             )
                             .disposed(by: disposeBag)
