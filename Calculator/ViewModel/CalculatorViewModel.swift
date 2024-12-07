@@ -430,6 +430,7 @@ class CalculatorViewModel: ObservableObject {
         else { //  숫자 버튼을 눌렀을 때
             if let num: String = button.BtnDisplay.string {
                 if isError {
+                    historyExpr.removeAll()
                     infix_Expr = [num]
                     displayExpr = [num]
                     isError = false //  새로운 계산 식이 시작이므로 다시 에러 플래그를 false로
