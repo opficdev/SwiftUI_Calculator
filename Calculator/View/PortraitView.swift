@@ -13,6 +13,7 @@ struct PortraitView: View {
     @Binding var isScientific: Bool
     @State private var btnData: [[BtnType]] = []
     
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -21,26 +22,34 @@ struct PortraitView: View {
                     Spacer()
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
-                            ForEach(calcVM.historyExpr.reversed(), id: \.self) { element in
-                                Text(element)
-                                    .font(.system(size: 40))
-                                    .foregroundColor(Color.gray)
-                            }
+                            Text(calcVM.historyExpr.reversed().joined())
+                                .font(.system(size: 40))
+                                .foregroundColor(Color.gray)
+                            
                         }
                     }
                     .environment(\.layoutDirection, .rightToLeft)   //  ScrollView를 우측에서 좌측으로
                     .disabled(true)
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 0) {
-                            ForEach(calcVM.displayExpr.reversed(), id: \.self) { element in
-                                Text(element)
+                        if calcVM.currentAC {   //  계산이 완료됨
+                            if let answer = calcVM.displayExpr.first {
+                                Text(calcVM.setNumberFmt(string: answer, scale: 10, style: .decimal))  //  우선 .decimal 로만
                                     .font(.system(size: 70))
-                                    .foregroundColor(calcVM.isEmpty || calcVM.isContains(string: element) ? Color.white : Color.gray)
+                                    .foregroundColor(Color.white)
+                            }
+                        }
+                        else {
+                            HStack(spacing: 0) {
+                                ForEach(calcVM.displayExpr.reversed(), id: \.self) { element in
+                                    Text(calcVM.setNumberFmt(string: element, style: .decimal))
+                                        .font(.system(size: 70))
+                                        .foregroundColor(calcVM.isContains(string: element) ? Color.white : Color.gray)
+                                }
                             }
                         }
                     }
                     .environment(\.layoutDirection, .rightToLeft)
-                    .disabled(true)    //  조건은 생각해 봐야함
+//                    .disabled()    //  조건은 생각해 봐야함
                     VStack {
                         ForEach(btnData, id: \.self) { col in
                             HStack {
