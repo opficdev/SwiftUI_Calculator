@@ -136,23 +136,25 @@ class CalculatorViewModel: ObservableObject {
         return stack.count == 0
     }
     
-    private func setNumberFmt(string: String) -> String {
-        let fmt = NumberFormatter()
-        fmt.numberStyle = .decimal
-        if let intValue = Int(string), let stringValue = fmt.string(from: NSNumber(value: intValue)) {
-            return stringValue
+    func setNumberFmt(string: String, scale: Int16 = Int16.max ,style: NumberFormatter.Style) -> String {
+        if let _ = Double(string) {
+            let fmt = NumberFormatter()
+            fmt.numberStyle = style
+            
+            let decimalNumber = NSDecimalNumber(string: string)
+            let handler = NSDecimalNumberHandler(
+                roundingMode: .plain,
+                scale: scale - 1,
+                raiseOnExactness: false,
+                raiseOnOverflow: false,
+                raiseOnUnderflow: false,
+                raiseOnDivideByZero: false
+            )
+            
+            return decimalNumber.rounding(accordingToBehavior: handler).stringValue
         }
+        
         return string
-    }
-    
-    private func setdisplayExprFmt() {
-        let fmt = NumberFormatter()
-        fmt.numberStyle = .decimal
-        if  let last = displayExpr.last,
-            let intValue = Int(last),
-            let stringValue = fmt.string(from: NSNumber(value: intValue)) {
-            displayExpr = [stringValue]
-        }
     }
     
     private func isRawExpr() -> Bool {
@@ -161,11 +163,26 @@ class CalculatorViewModel: ObservableObject {
         }
     }
 
-    
-    
     func isContains(string: String) -> Bool {
         let stringValue = string.replacingOccurrences(of: ",", with: "")
         return infix_Expr.contains(stringValue)
+    }
+    
+    func roundToNPlace(for string: String, place: Int16) -> String {
+        if string.count == 1 {
+            return string
+        }
+        let decimalNumber = NSDecimalNumber(string: string)
+        let handler = NSDecimalNumberHandler(
+            roundingMode: .plain,
+            scale: place - 1,
+            raiseOnExactness: false,
+            raiseOnOverflow: false,
+            raiseOnUnderflow: false,
+            raiseOnDivideByZero: false
+        )
+        let roundedNumber = decimalNumber.rounding(accordingToBehavior: handler)
+        return roundedNumber.stringValue
     }
     
     func handleButtonPress(_ button: BtnType) {
@@ -237,7 +254,6 @@ class CalculatorViewModel: ObservableObject {
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
-            setdisplayExprFmt()
             
             if !isError {
                 id = UUID()
@@ -283,7 +299,7 @@ class CalculatorViewModel: ObservableObject {
                         let tmp = String(num[..<index])
                         infix_Expr.append(tmp)
                     }
-                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }
+                    displayExpr = infix_Expr
                 }
             }
             if displayExpr.isEmpty {
@@ -319,7 +335,7 @@ class CalculatorViewModel: ObservableObject {
                         let num = String(infix_Expr.removeLast().dropFirst())
                         infix_Expr[infix_Expr.endIndex - 1] = num
                     }
-                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }
+                    displayExpr = infix_Expr
                 }
             }
         }
@@ -464,7 +480,7 @@ class CalculatorViewModel: ObservableObject {
                             infix_Expr.append(")")
                         }
                     }
-                    displayExpr = infix_Expr.map { setNumberFmt(string: $0) }
+                    displayExpr = infix_Expr
                 }
                 else {
                     infix_Expr.append(num)
@@ -491,5 +507,7 @@ class CalculatorViewModel: ObservableObject {
             }
         }
     }
+    
+
 }
 
