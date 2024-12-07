@@ -126,7 +126,7 @@ class HistoryViewModel: ObservableObject {
         }
     }
     
-    func setNumberFmt(string: String, scale: Int16 = Int16.max ,style: NumberFormatter.Style) -> String {
+    func setNumberFmt(string: String ,style: NumberFormatter.Style) -> String {
         if let _ = Double(string) {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
@@ -134,14 +134,15 @@ class HistoryViewModel: ObservableObject {
             let decimalNumber = NSDecimalNumber(string: string)
             let handler = NSDecimalNumberHandler(
                 roundingMode: .plain,
-                scale: scale - 1,
+                scale: 3,
                 raiseOnExactness: false,
                 raiseOnOverflow: false,
                 raiseOnUnderflow: false,
                 raiseOnDivideByZero: false
             )
             
-            return decimalNumber.rounding(accordingToBehavior: handler).stringValue
+            let NS = decimalNumber.rounding(accordingToBehavior: handler)
+            return fmt.string(for: NS) ?? NS.stringValue
         }
         
         return string

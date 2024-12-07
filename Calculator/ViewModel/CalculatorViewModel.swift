@@ -140,6 +140,7 @@ class CalculatorViewModel: ObservableObject {
         if let _ = Double(string) {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
+            fmt.maximumFractionDigits = Int(scale)
             
             let decimalNumber = NSDecimalNumber(string: string)
             let handler = NSDecimalNumberHandler(
@@ -151,7 +152,8 @@ class CalculatorViewModel: ObservableObject {
                 raiseOnDivideByZero: false
             )
             
-            return decimalNumber.rounding(accordingToBehavior: handler).stringValue
+            let NS = decimalNumber.rounding(accordingToBehavior: handler)
+            return fmt.string(for: NS) ?? NS.stringValue
         }
         
         return string
