@@ -64,7 +64,10 @@ struct HistoryView: View {
                                                     .padding(.bottom)
                                                 Text(arr[idx].historyExpr.joined())
                                                     .foregroundColor(Color.gray)
-                                                Text(historyVM.roundToFourth(for: arr[idx].displayExpr.joined()))
+                                                Text(historyVM.setNumberFmt(string: arr[idx].displayExpr.joined(),
+                                                                            scale: 4,
+                                                                            style: .decimal)
+                                                )
                                                     .font(.title3)
                                                     .foregroundColor(Color.white)
                                                 Divider()
