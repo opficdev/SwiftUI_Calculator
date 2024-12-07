@@ -196,4 +196,6 @@ struct HistoryView: View {
 
 #Preview {
     HistoryView()
+        .environmentObject(HistoryViewModel())
+        .environmentObject(CalculatorViewModel())
 }
