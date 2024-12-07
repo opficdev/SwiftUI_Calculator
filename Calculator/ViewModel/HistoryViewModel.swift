@@ -125,26 +125,19 @@ class HistoryViewModel: ObservableObject {
             }
         }
     }
-    
-    func setNumberFmt(string: String ,style: NumberFormatter.Style) -> String {
-        if let _ = Double(string) {
+    func setNumberFmt(string: String, style: NumberFormatter.Style) -> String {
+        if let decimalValue = Decimal(string: string) {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
-            
-            let decimalNumber = NSDecimalNumber(string: string)
-            let handler = NSDecimalNumberHandler(
-                roundingMode: .plain,
-                scale: 3,
-                raiseOnExactness: false,
-                raiseOnOverflow: false,
-                raiseOnUnderflow: false,
-                raiseOnDivideByZero: false
-            )
-            
-            let NS = decimalNumber.rounding(accordingToBehavior: handler)
-            return fmt.string(for: NS) ?? NS.stringValue
+
+            // 소수점 자리수 반올림
+            var value = decimalValue
+            var roundedValue = Decimal()
+            NSDecimalRound(&roundedValue, &value, 4, .plain)
+
+            return fmt.string(for: roundedValue) ?? "\(roundedValue)"
         }
-        
+
         return string
     }
 }

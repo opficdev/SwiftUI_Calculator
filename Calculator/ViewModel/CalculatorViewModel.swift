@@ -88,19 +88,20 @@ class CalculatorViewModel: ObservableObject {
                 stack.append(i)
             }
             else {
-                if let num2 = stack.popLast(), let num1 = stack.popLast() {
+                if let str2 = stack.popLast(), let str1 = stack.popLast(),
+                   let num1 = Decimal(string: str1), let num2 = Decimal(string: str2) {
                     if i == "+"{
-                        stack.append((NSDecimalNumber(string: num1).adding(NSDecimalNumber(string: num2))).stringValue)
+                        stack.append("\(num1 + num2)")
                     }
                     else if i == "-" {
-                        stack.append((NSDecimalNumber(string: num1).subtracting(NSDecimalNumber(string: num2))).stringValue)
+                        stack.append("\(num1 - num2)")
                     }
                     else if i == "×" {
-                        stack.append((NSDecimalNumber(string: num1).multiplying(by: NSDecimalNumber(string: num2))).stringValue)
+                        stack.append("\(num1 * num2)")
                     }
                     else if i == "÷" {
-                        if num2 != "0" {
-                            stack.append((NSDecimalNumber(string: num1).dividing(by: NSDecimalNumber(string: num2))).stringValue)
+                        if str2 != "0" {
+                            stack.append("\(num1 / num2)")
                         }
                         else{   // 0으로 나누는 예외처리
                             isError = true
@@ -136,26 +137,20 @@ class CalculatorViewModel: ObservableObject {
         return stack.count == 0
     }
     
-    func setNumberFmt(string: String, scale: Int16 = Int16.max ,style: NumberFormatter.Style) -> String {
-        if let _ = Double(string) {
+    func setNumberFmt(string: String, scale: Int = Int.max, style: NumberFormatter.Style) -> String {
+        if let decimalValue = Decimal(string: string) {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
-            fmt.maximumFractionDigits = Int(scale)
-            
-            let decimalNumber = NSDecimalNumber(string: string)
-            let handler = NSDecimalNumberHandler(
-                roundingMode: .plain,
-                scale: scale - 1,
-                raiseOnExactness: false,
-                raiseOnOverflow: false,
-                raiseOnUnderflow: false,
-                raiseOnDivideByZero: false
-            )
-            
-            let NS = decimalNumber.rounding(accordingToBehavior: handler)
-            return fmt.string(for: NS) ?? NS.stringValue
+            fmt.maximumFractionDigits = scale - 1
+
+            // 소수점 자리수 반올림
+            var value = decimalValue
+            var roundedValue = Decimal()
+            NSDecimalRound(&roundedValue, &value, scale - 1, .plain)
+
+            return fmt.string(for: roundedValue) ?? "\(roundedValue)"
         }
-        
+
         return string
     }
     
@@ -168,23 +163,6 @@ class CalculatorViewModel: ObservableObject {
     func isContains(string: String) -> Bool {
         let stringValue = string.replacingOccurrences(of: ",", with: "")
         return infix_Expr.contains(stringValue)
-    }
-    
-    func roundToNPlace(for string: String, place: Int16) -> String {
-        if string.count == 1 {
-            return string
-        }
-        let decimalNumber = NSDecimalNumber(string: string)
-        let handler = NSDecimalNumberHandler(
-            roundingMode: .plain,
-            scale: place - 1,
-            raiseOnExactness: false,
-            raiseOnOverflow: false,
-            raiseOnUnderflow: false,
-            raiseOnDivideByZero: false
-        )
-        let roundedNumber = decimalNumber.rounding(accordingToBehavior: handler)
-        return roundedNumber.stringValue
     }
     
     func handleButtonPress(_ button: BtnType) {
@@ -457,8 +435,8 @@ class CalculatorViewModel: ObservableObject {
                     isError = false //  새로운 계산 식이 시작이므로 다시 에러 플래그를 false로
                 }
                 else if let last = infix_Expr.last {
-                    if let intValue = Int(last) {  //  수식이 숫자로 끝났을 때
-                        if intValue == 0 {
+                    if let decimalValue = Decimal(string: last) {  //  수식이 숫자로 끝났을 때
+                        if decimalValue == 0 {
                             infix_Expr.removeLast()
                             if num != "0" {
                                 infix_Expr.append(num)
