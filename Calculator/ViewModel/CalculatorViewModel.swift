@@ -42,7 +42,7 @@ class CalculatorViewModel: ObservableObject {
     // 입력된 식의 마지막이 숫자인지 판별
     private func endsWithNumber() -> Bool {
         let last = infix_Expr.last
-        if last == nil || (last != "+" && last != "-" && last != "×" && last != "÷" && last != "(" && last != ")"){
+        if last == nil || priority(last!) == -1 {
             return true
         }
         return false
@@ -138,11 +138,17 @@ class CalculatorViewModel: ObservableObject {
     }
     
     func setNumberFmt(string: String, scale: Int = Int.max, style: NumberFormatter.Style) -> String {
+        if priority(string) != -1 {
+            return string
+        }
         if let decimalValue = Decimal(string: string) {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
             fmt.maximumFractionDigits = scale - 1
 
+            if scale == Int.max {   //  소수부 반올림이 필요 없을 때
+                return fmt.string(for: string) ?? string
+            }
             // 소수점 자리수 반올림
             var value = decimalValue
             var roundedValue = Decimal()
@@ -287,12 +293,13 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .dot {
-            if isError {
-                displayExpr = ["0."]
+            if isError || infix_Expr.isEmpty {
+                infix_Expr = ["0."]
             }
-            else if !displayExpr.contains(".") {
-                displayExpr.append(".")
+            else if endsWithNumber() && !infix_Expr.last!.contains(".") {
+                infix_Expr[infix_Expr.endIndex - 1] += "."
             }
+            displayExpr = infix_Expr
         }
         else if button == .oppo {
             if !isError {
@@ -438,10 +445,10 @@ class CalculatorViewModel: ObservableObject {
                 else if let last = infix_Expr.last {
                     if let decimalValue = Decimal(string: last) {  //  수식이 숫자로 끝났을 때
                         if decimalValue == 0 {
-                            infix_Expr.removeLast()
-                            if num != "0" {
-                                infix_Expr.append(num)
+                            if last == "0" {
+                                infix_Expr.removeLast()
                             }
+                            infix_Expr.append(num)
                         }
                         else if currentAC {
                             historyExpr.removeAll()
@@ -449,7 +456,7 @@ class CalculatorViewModel: ObservableObject {
                             displayExpr = [num]
                         }
                         else {
-                            infix_Expr[infix_Expr.count - 1] += num
+                            infix_Expr[infix_Expr.endIndex - 1] += num
                         }
                     }
                     else {
@@ -483,7 +490,7 @@ class CalculatorViewModel: ObservableObject {
             // 이 경우엔 currentAC 값을 유지한다
         }
         else {
-            if !isError {
+            if !isError && infix_Expr.last != "0" {
                 currentAC = false
             }
         }
