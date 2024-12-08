@@ -130,14 +130,8 @@ class HistoryViewModel: ObservableObject {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
 
-            // 소수점 자리수 반올림
-            var value = decimalValue
-            var roundedValue = Decimal()
-            NSDecimalRound(&roundedValue, &value, 4, .plain)
-
-            return fmt.string(for: roundedValue) ?? "\(roundedValue)"
+            return fmt.string(for: decimalValue) ?? string
         }
-
         return string
     }
 }
