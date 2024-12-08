@@ -242,7 +242,7 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-            historyExpr = displayExpr
+            historyExpr = displayExpr.map { setNumberFmt(string: $0, style: .decimal) } //  historyExpr은 .decimal으로만 저장되는것 같음 + 저장된 이후 불변
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
