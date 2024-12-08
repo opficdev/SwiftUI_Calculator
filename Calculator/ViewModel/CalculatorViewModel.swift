@@ -138,16 +138,22 @@ class CalculatorViewModel: ObservableObject {
     }
     
     func setNumberFmt(string: String, scale: Int = Int.max, style: NumberFormatter.Style) -> String {
-        if priority(string) != -1 {
-            return string
-        }
         if let decimalValue = Decimal(string: string) {
             let fmt = NumberFormatter()
             fmt.numberStyle = style
             fmt.maximumFractionDigits = scale - 1
 
             if scale == Int.max {   //  소수부 반올림이 필요 없을 때
-                return fmt.string(for: string) ?? string
+                if let dotIndex = string.firstIndex(of: ".") {  //  소수점이 있을 때
+                    if let stringValue = fmt.string(for: decimalValue) {    //  이 과정에서 소수점 날라갈 수 있음
+                        let integer = String(stringValue[..<string.index(dotIndex, offsetBy: stringValue.count(where: { $0 == ","}))])  //  정수부
+                        let fractional = String(string[string.index(dotIndex, offsetBy: stringValue.count(where: { $0 == ","}))...])   //  소수점 + 소수부 || ""(소수점이 날라간 직후의 상태)
+                        return integer + (fractional.first == "." ? "" : ".") + fractional
+                    }
+                }
+                else {
+                    return fmt.string(for: decimalValue) ?? string
+                }
             }
             // 소수점 자리수 반올림
             var value = decimalValue
