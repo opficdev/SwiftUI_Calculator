@@ -22,7 +22,7 @@ struct PortraitView: View {
                     Spacer()
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
-                            Text(calcVM.historyExpr.reversed().joined())
+                            Text(calcVM.historyExpr.joined())
                                 .font(.system(size: 40))
                                 .foregroundColor(Color.gray)
                             
@@ -43,7 +43,7 @@ struct PortraitView: View {
                                 ForEach(calcVM.displayExpr.reversed(), id: \.self) { element in
                                     Text(calcVM.setNumberFmt(string: element, style: .decimal))
                                         .font(.system(size: 70))
-                                        .foregroundColor(calcVM.isContains(string: element) ? Color.white : Color.gray)
+                                        .foregroundColor(Color.white)
                                 }
                             }
                         }
