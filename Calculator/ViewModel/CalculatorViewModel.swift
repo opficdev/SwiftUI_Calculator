@@ -27,13 +27,13 @@ class CalculatorViewModel: ObservableObject {
     
     // 연산자 우선순위
     private func priority(_ op: String) -> Int {
-        if op == "(" || op == ")"{
+        if op == "(" || op == ")" {
             return 0
         }
-        if op == "+" || op == "-"{
+        if op == "+" || op == "-" {
             return 1
         }
-        if op == "×" || op == "÷"{
+        if op == "×" || op == "÷" {
             return 2
         }
         return -1
@@ -146,9 +146,12 @@ class CalculatorViewModel: ObservableObject {
             if scale == Int.max {   //  소수부 반올림이 필요 없을 때
                 if let dotIndex = string.firstIndex(of: ".") {  //  소수점이 있을 때
                     if let stringValue = fmt.string(for: decimalValue) {    //  이 과정에서 소수점 날라갈 수 있음
-                        let integer = String(stringValue[..<string.index(dotIndex, offsetBy: stringValue.count(where: { $0 == ","}))])  //  정수부
-                        let fractional = String(string[string.index(dotIndex, offsetBy: stringValue.count(where: { $0 == ","}))...])   //  소수점 + 소수부 || ""(소수점이 날라간 직후의 상태)
-                        return integer + (fractional.first == "." ? "" : ".") + fractional
+                        var integer = stringValue   //  정수부
+                        if let integerDotIndex = integer.firstIndex(of: ".") {
+                            integer = String(integer[..<integerDotIndex])
+                        }
+                        let fractional = String(string[dotIndex...])   //  "." + 소수부
+                        return integer + fractional
                     }
                 }
                 else {
@@ -449,40 +452,49 @@ class CalculatorViewModel: ObservableObject {
                     isError = false //  새로운 계산 식이 시작이므로 다시 에러 플래그를 false로
                 }
                 else if let last = infix_Expr.last {
-                    if let decimalValue = Decimal(string: last) {  //  수식이 숫자로 끝났을 때
+                    if let decimalValue = Decimal(string: last){  //  수식이 숫자로 끝났을 때
                         if decimalValue == 0 {
-                            if last == "0" {
-                                infix_Expr.removeLast()
+                            if last == "0" {}
+                            else if last.contains(".") {
+                                infix_Expr[infix_Expr.endIndex - 1] += num
                             }
-                            infix_Expr.append(num)
+                            else {
+                                infix_Expr.append(num)
+                            }
                         }
                         else if currentAC {
                             historyExpr.removeAll()
                             infix_Expr = [num]
-                            displayExpr = [num]
                         }
                         else {
                             infix_Expr[infix_Expr.endIndex - 1] += num
                         }
+                        displayExpr = infix_Expr
                     }
                     else {
                         if bracketCorrection() {
-                            infix_Expr.append(num)
+                            if last.last == "." {    //  소수점으로 끝나는 상태일 때
+                                infix_Expr[infix_Expr.endIndex - 1] += num
+                            }
+                            else {
+                                infix_Expr.append(num)
+                            }
+                            displayExpr = infix_Expr
                         }
                         else {
                             infix_Expr[infix_Expr.endIndex - 1] = num
                             infix_Expr.append(")")
                         }
                     }
-                    displayExpr = infix_Expr
                 }
                 else {
-                    infix_Expr.append(num)
+                    infix_Expr = [num]
                     displayExpr = [num]
                 }
+                
             }
         }
-        
+        print(infix_Expr)
         // 아래 조건문들은 위에 있는 조건문들에 다 일일이 쓰면 currentAC 관련 코드를 넣으면 더러워질 것 같아서 따로 빼놓음
         if infix_Expr.isEmpty {
             currentAC = true
