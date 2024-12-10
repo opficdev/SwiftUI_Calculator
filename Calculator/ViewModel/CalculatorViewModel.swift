@@ -137,36 +137,67 @@ class CalculatorViewModel: ObservableObject {
         return stack.count == 0
     }
     
-    func setNumberFmt(string: String, scale: Int = Int.max, style: NumberFormatter.Style) -> String {
-        if let decimalValue = Decimal(string: string) {
-            let fmt = NumberFormatter()
-            fmt.numberStyle = style
-            fmt.maximumFractionDigits = scale - 1
-
-            if scale == Int.max {   //  소수부 반올림이 필요 없을 때
-                if let dotIndex = string.firstIndex(of: ".") {  //  소수점이 있을 때
-                    if let stringValue = fmt.string(for: decimalValue) {    //  이 과정에서 소수점 날라갈 수 있음
-                        var integer = stringValue   //  정수부
-                        if let integerDotIndex = integer.firstIndex(of: ".") {
-                            integer = String(integer[..<integerDotIndex])
-                        }
-                        let fractional = String(string[dotIndex...])   //  "." + 소수부
-                        return integer + fractional
+    func setNumberFmt(number: String, round: Bool = false, portrait: Bool) -> String {
+        if -1 < priority(number) {  //  실수형 아님
+            return number
+        }
+        let fmt = NumberFormatter()
+        
+        if round {
+            fmt.numberStyle = .scientific
+            fmt.exponentSymbol = "e"
+            guard let sci = fmt.string(for: Decimal(string: number)) else { return number }
+            
+            if let eIndex = sci.firstIndex(of: "e") {
+                let exponent = Int(sci[sci.index(after: eIndex)...].filter{ $0 != "-" })!   //  e뒤에 숫자
+                
+                if portrait {
+                    if exponent < (number.contains(".") ? 8 : 9) {
+                        fmt.numberStyle = .decimal
+                        fmt.maximumFractionDigits = number.first! == "0" ? 8 + exponent : 9 - number.filter{ $0 != "-" }.split(separator: ".").first!.count    //  first가 오류날 수 있는 경우는 number.filter 의 결과가 "" 일때
+                        return fmt.string(for: Decimal(string: number))!
                     }
+                    
+                    if exponent <= 18 || abs(Decimal(string: number)!) < 1 {
+                        fmt.maximumFractionDigits = exponent - (number.contains(".") ? 1 : 3)
+                        return fmt.string(for: Decimal(string: number))!
+                    }
+                    
+                    if let first = (sci.split(separator: "e").map { String($0) }).first {
+                        if var firstNum = first.split(separator: ".").first {
+                            firstNum = firstNum.split(separator: "-").last!
+                            if firstNum.count == 1  {
+                                //  [-500, 0] 부분
+                                if Decimal(string: "\(Int(firstNum)!)" + String(repeating: "9", count: exponent))! - Decimal(499) <= abs(Decimal(string: number)!) &&
+                                    abs(Decimal(string: number)!) <= Decimal(string: "\(Int(firstNum)! + 1)" + String(repeating: "0", count: exponent))! {
+                                    fmt.maximumFractionDigits = exponent - (number.contains(".") ? 1 : 3)
+                                    return fmt.string(for: Decimal(string: number))!
+                                }
+                                //  (0, 500] 부분
+                                if Decimal(string: "\(Int(firstNum)! - 1)" + String(repeating: "9", count: exponent))! <= abs(Decimal(string: number)!) &&
+                                    abs(Decimal(string: number)!) <= Decimal(string: "\(Int(firstNum)!)" + String(repeating: "0", count: exponent))! + Decimal(500) {
+                                    fmt.maximumFractionDigits = exponent - (number.contains(".") ? 1 : 3)
+                                    return fmt.string(for: Decimal(string: number))!
+                                }
+                            }
+                        }
+                    }
+                    fmt.numberStyle = .decimal
+                    return fmt.string(for: Decimal(string: number))!
                 }
                 else {
-                    return fmt.string(for: decimalValue) ?? string
+                    
                 }
             }
-            // 소수점 자리수 반올림
-            var value = decimalValue
-            var roundedValue = Decimal()
-            NSDecimalRound(&roundedValue, &value, scale - 1, .plain)
-
-            return fmt.string(for: roundedValue) ?? "\(roundedValue)"
         }
-
-        return string
+        var decimal = number
+        fmt.numberStyle = .decimal
+        if let dotIndex = number.firstIndex(of: ".") {
+            decimal = String(number[..<dotIndex])
+            let fraction = String(number[dotIndex...])
+            return (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction
+        }
+        return fmt.string(for: Decimal(string: decimal)) ?? number
     }
     
     private func isRawExpr() -> Bool {
@@ -245,7 +276,7 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-            historyExpr = displayExpr.map { setNumberFmt(string: $0, style: .decimal) } //  historyExpr은 .decimal으로만 저장되는것 같음 + 저장된 이후 불변
+            historyExpr = displayExpr.map { setNumberFmt(number: $0, portrait: true) } // 
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
@@ -454,7 +485,9 @@ class CalculatorViewModel: ObservableObject {
                 else if let last = infix_Expr.last {
                     if let decimalValue = Decimal(string: last){  //  수식이 숫자로 끝났을 때
                         if decimalValue == 0 {
-                            if last == "0" {}
+                            if last == "0" {
+                                infix_Expr = [num]
+                            }
                             else if last.contains(".") {
                                 infix_Expr[infix_Expr.endIndex - 1] += num
                             }
@@ -494,7 +527,7 @@ class CalculatorViewModel: ObservableObject {
                 
             }
         }
-        print(infix_Expr)
+        
         // 아래 조건문들은 위에 있는 조건문들에 다 일일이 쓰면 currentAC 관련 코드를 넣으면 더러워질 것 같아서 따로 빼놓음
         if infix_Expr.isEmpty {
             currentAC = true
