@@ -34,15 +34,15 @@ struct ContentView: View {
                     .foregroundColor(Color.orange)
             })
             .padding()
-            if orientation.isPortrait {
+//            if orientation.isPortrait {
                 PortraitView(isScientific: $isScientific)
                     .environmentObject(calcVM)
                     .padding()
                     .padding(.bottom)
-            }
-            else {  //가로모드
-                
-            }
+//            }
+//            else {  //가로모드
+//                
+//            }
            
         }
         .sheet(isPresented: $historyVM.showSheet) {
