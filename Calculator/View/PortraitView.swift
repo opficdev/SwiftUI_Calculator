@@ -27,7 +27,7 @@ struct PortraitView: View {
                         }
                     }
                     .environment(\.layoutDirection, .rightToLeft)   //  ScrollView를 우측에서 좌측으로
-                    .disabled(true)
+//                    .disabled()
                     ScrollView(.horizontal, showsIndicators: false) {
                         if calcVM.currentAC {   //  계산이 완료됨
                             if let answer = calcVM.displayExpr.first {
@@ -38,11 +38,21 @@ struct PortraitView: View {
                         }
                         else {
                             HStack(spacing: 0) {
-                                ForEach(calcVM.displayExpr.reversed(), id: \.self) { element in
-                                    Text(calcVM.setNumberFmt(number: element, portrait: true))
-                                        .font(.system(size: 70))
-                                        .foregroundColor(Color.white)
+                                ForEach(Array(calcVM.displayExpr.reversed().enumerated()), id: \.offset) { index, element in
+                                    Text(
+                                        calcVM.setNumberFmt(
+                                            number: element,
+                                            round: calcVM.displayExpr.count > 1 && index == calcVM.displayExpr.endIndex - 1,
+                                            portrait: true
+                                        )
+                                    )
+                                    .font(.system(size: 70))
+                                    .foregroundColor(Color.white)
+                                    .onAppear {
+                                        print("\(index): \(element)")
+                                    }
                                 }
+
                             }
                         }
                     }
