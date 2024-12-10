@@ -556,6 +556,10 @@ class CalculatorViewModel: ObservableObject {
                 currentAC = false
             }
         }
+        
+        if !currentAC { //  !currentAC는 현재 수식이 입력 중이라는 것을 의미함
+            historyExpr.removeAll()
+        }
     }
     
 
