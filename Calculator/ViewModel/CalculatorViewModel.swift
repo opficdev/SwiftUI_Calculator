@@ -205,6 +205,11 @@ class CalculatorViewModel: ObservableObject {
             ["+", "-", "×", "÷"].contains($0)
         }
     }
+    
+    func exprNumberCount(expr: [String]) -> Int {
+        let string = expr.joined() //  수식에서 숫자인것만 필터링 해서 문자열로
+        return string.count - string.count { $0 == "." || priority(String($0)) != -1 } // 소수점과 다른 괄호같은 건 제거해야함
+    }
 
     func isContains(string: String) -> Bool {
         let stringValue = string.replacingOccurrences(of: ",", with: "")
@@ -276,7 +281,13 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-            historyExpr = displayExpr.map { setNumberFmt(number: $0, portrait: true) } // 
+            historyExpr = displayExpr.enumerated().map { index, item in
+                setNumberFmt(
+                    number: item,
+                    round: displayExpr.count > 1 && index == 0,
+                    portrait: true
+                )
+            }
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr
