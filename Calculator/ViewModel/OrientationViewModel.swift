@@ -10,6 +10,7 @@ import SwiftUI
 import UIKit
 import RxSwift
 import RxCocoa
+import Combine
 
 // ViewModel 역할: Orientation 관리와 뷰 상태 관리
 class OrientationViewModel: ObservableObject {
@@ -17,6 +18,8 @@ class OrientationViewModel: ObservableObject {
     @Published var isPortrait: Bool = true
     
     private let disposeBag = DisposeBag()
+    
+    private var orientationSubscription: AnyCancellable?
     
     init() {
         updateOrientation(UIDevice.current.orientation)
@@ -29,6 +32,15 @@ class OrientationViewModel: ObservableObject {
                 self?.updateOrientation(newOrientation)
             })
             .disposed(by: disposeBag)
+        
+//  MARK: Combine 관련 코드
+//        orientationSubscription = NotificationCenter.default
+//                .publisher(for: UIDevice.orientationDidChangeNotification)
+//                .compactMap { $0.object as? UIDevice }
+//                .map { $0.orientation }
+//                .sink { [weak self] newOrientation in
+//                    self?.updateOrientation(newOrientation)
+//                }
         
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
     }

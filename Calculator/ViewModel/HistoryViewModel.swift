@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import Combine
 
 class HistoryViewModel: ObservableObject { 
     @Published var showSheet = false
@@ -15,6 +16,9 @@ class HistoryViewModel: ObservableObject {
     @Published var removeAllAlert = false
     @Published var removeAlert = false
     @Published var historyData: [String: [History]] = [:]
+    
+    //  구독 관리용 Combine 변수
+    private var cancellables = Set<AnyCancellable>()
     
     private let disposeBag = DisposeBag()
     // BehaviorRelay (RxSwift 데이터 흐름 관리용)
@@ -39,6 +43,27 @@ class HistoryViewModel: ObservableObject {
                 }
             })
             .disposed(by: disposeBag)
+        
+//  MARK: Combime 코드
+//        NotificationCenter.Publisher(center: NotificationCenter.default, name: UserDefaults.didChangeNotification)
+//            .sink { [weak self] _ in
+//            guard let self = self else { return }
+//            
+//            // UserDefaults에서 "dateArr" 키로 저장된 배열을 가져오기
+//            if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+//                // dateArr 배열을 순회하며 데이터 가져오기
+//                for dateString in dateArr {
+//                    if let data = UserDefaults.standard.data(forKey: dateString),
+//                       let decodedData = try? JSONDecoder().decode([String: [History]].self, from: data) {
+//                        // 디코딩된 데이터를 main 스레드에서 처리
+//                        DispatchQueue.main.async {
+//                            self.historyData = decodedData
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        .store(in: &cancellables) // 구독을 저장하여 해제되지 않도록 합니다
     }
     
     //  기록 수정 모드에서 선택된 기록의 갯수를 반환
@@ -112,6 +137,51 @@ class HistoryViewModel: ObservableObject {
             return Disposables.create()
         }
     }
+    
+//  MARK: 아래 두 함수들은 Combine 코드입니다
+    // 선택된 계산 기록들을 제거
+//    func removeHistory() -> AnyPublisher<Void, Never> {
+//        return Future { promise in
+//            for keyString in self.historyData.keys {
+//                let filterData = self.historyData[keyString]!.filter { !$0.isChecked }
+//                
+//                if filterData.isEmpty {
+//                    UserDefaults.standard.removeObject(forKey: keyString)
+//                    if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+//                        UserDefaults.standard.set(dateArr.filter { $0 != keyString }, forKey: "dateArr")
+//                    }
+//                } else if let encodeData = try? JSONEncoder().encode([keyString: filterData]) {
+//                    UserDefaults.standard.set(encodeData, forKey: keyString)
+//                }
+//            }
+//            
+//            if let dateArr = UserDefaults.standard.array(forKey: "dateArr"), dateArr.isEmpty {
+//                self.modifyHistory = false
+//                UserDefaults.standard.removeObject(forKey: "dateArr")
+//            }
+//            
+//            // 완료
+//            promise(.success(()))
+//        }
+//        .eraseToAnyPublisher()
+//    }
+    
+    // 모든 계산 기록을 제거
+//    func removeAllHistory() -> AnyPublisher<Void, Never> {
+//        return Future { promise in
+//            if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+//                for dateString in dateArr {
+//                    UserDefaults.standard.removeObject(forKey: dateString)
+//                }
+//            }
+//            UserDefaults.standard.removeObject(forKey: "dateArr")
+//            
+//            // 완료
+//            promise(.success(()))
+//        }
+//        .eraseToAnyPublisher()
+//    }
+
     
     //  선택 된 후 삭제하지 않았을 시 체크를 원복시켜주는 함수
     func resetCheck() {
