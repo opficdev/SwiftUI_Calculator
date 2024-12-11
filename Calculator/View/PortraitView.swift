@@ -48,16 +48,13 @@ struct PortraitView: View {
                                     )
                                     .font(.system(size: 70))
                                     .foregroundColor(Color.white)
-                                    .onAppear {
-                                        print("\(index): \(element)")
-                                    }
                                 }
 
                             }
                         }
                     }
                     .environment(\.layoutDirection, .rightToLeft)
-//                    .disabled()    //  조건은 생각해 봐야함
+//                    .disabled(calcVM.exprNumberCount(expr: calcVM.displayExpr) < 10)
                     VStack {
                         ForEach(btnData, id: \.self) { col in
                             HStack {
@@ -78,6 +75,14 @@ struct PortraitView: View {
                                                                     geometry.size.width / CGFloat(col.count) - 8) * 0.4)
                                             )
                                     }
+                                    .simultaneousGesture(
+                                        LongPressGesture(minimumDuration: 0.5)
+                                            .onEnded { _ in
+                                                if button == BtnType.clear {
+                                                    calcVM.handleButtonPress(BtnType.allClear)
+                                            }
+                                        }
+                                    )
                                 }
                             }
                         }
