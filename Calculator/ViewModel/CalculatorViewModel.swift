@@ -185,7 +185,7 @@ class CalculatorViewModel: ObservableObject {
                     fmt.numberStyle = .decimal
                     return fmt.string(for: Decimal(string: number))!
                 }
-                else {
+                else {  //  가로 모드
                     
                 }
             }
@@ -561,7 +561,5 @@ class CalculatorViewModel: ObservableObject {
             historyExpr.removeAll()
         }
     }
-    
-
 }
 
