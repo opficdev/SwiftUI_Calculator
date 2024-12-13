@@ -58,7 +58,7 @@ enum BtnType{
         case .clear:
             return CalcButton(image: "delete.backward")
         case .oppo:
-            return CalcButton(image: "plus.forwardslash.minus")
+            return CalcButton(string: "%", image: "plus.forwardslash.minus")
         case .perc:
             return CalcButton(image: "percent")
         case .lbrac:
