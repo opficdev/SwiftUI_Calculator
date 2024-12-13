@@ -24,9 +24,10 @@ struct PortraitView: View {
                             Text(calcVM.historyExpr.joined())
                                 .font(.system(size: 40))
                                 .foregroundColor(Color.gray)
+                                .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                         }
                     }
-                    .environment(\.layoutDirection, .rightToLeft)   //  ScrollView를 우측에서 좌측으로
+                    .scaleEffect(x: -1, y: 1)
 //                    .disabled()
                     ScrollView(.horizontal, showsIndicators: false) {
                         if calcVM.currentAC {   //  계산이 완료됨
@@ -34,6 +35,7 @@ struct PortraitView: View {
                                 Text(calcVM.setNumberFmt(number: answer, round: true, portrait: true))
                                     .font(.system(size: 70))
                                     .foregroundColor(Color.white)
+                                    .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                             }
                         }
                         else {
@@ -48,13 +50,15 @@ struct PortraitView: View {
                                     )
                                     .font(.system(size: 70))
                                     .foregroundColor(Color.white)
+                                    .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                                 }
 
                             }
                         }
                     }
-                    .environment(\.layoutDirection, .rightToLeft)
-//                    .disabled(calcVM.exprNumberCount(expr: calcVM.displayExpr) < 10)
+                    .scaleEffect(x: -1, y: 1)
+                    .border(Color.white)
+//                    .disabled()
                     VStack {
                         ForEach(btnData, id: \.self) { col in
                             HStack {
