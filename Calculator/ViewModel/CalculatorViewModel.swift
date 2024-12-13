@@ -33,7 +33,7 @@ class CalculatorViewModel: ObservableObject {
         if op == "+" || op == "-" {
             return 1
         }
-        if op == "×" || op == "÷" {
+        if op == "×" || op == "÷" || op == "%" {
             return 2
         }
         return -1
@@ -84,12 +84,13 @@ class CalculatorViewModel: ObservableObject {
        let postfix = infix_Postfix()
        var stack:[String] = []
         for i in postfix{
-            if i != "+" && i != "-" && i != "×" && i != "÷" {
+            if i != "+" && i != "-" && i != "×" && i != "÷" && i != "%" {
                 stack.append(i)
             }
             else {
-                if let str2 = stack.popLast(), let str1 = stack.popLast(),
+                if let str2 = stack.last, let str1 = stack.secondToLast,
                    let num1 = Decimal(string: str1), let num2 = Decimal(string: str2) {
+                    stack.removeLast(); stack.removeLast()
                     if i == "+"{
                         stack.append("\(num1 + num2)")
                     }
@@ -108,11 +109,21 @@ class CalculatorViewModel: ObservableObject {
                             return ["정의되지 않음"]
                         }
                     }
+                    else if i == "%" {
+                        stack.append("\(num1)")
+                        stack.append("\(num2 / 100)")
+                    }
                 }
+                else if let str = stack.last, let num = Decimal(string: str), i == "%" {
+                    stack.removeLast()
+                    stack.append("\(num / 100)")
+                }
+                //  잘못된 입력으로 인해 popLast() 들에 의해 데이터가 소멸된다면 복구시켜야 할 소요는 있지 않을까?
                 else {
                     isError = true
                     return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
                 }
+                print(displayExpr)
             }
         }
         return [stack.removeLast()]
@@ -202,7 +213,7 @@ class CalculatorViewModel: ObservableObject {
     
     private func isRawExpr() -> Bool {
         return !infix_Expr.contains {
-            ["+", "-", "×", "÷"].contains($0)
+            ["+", "-", "×", "÷", "%"].contains($0)  //  priority()로 어떻게 할 수 있을듯?
         }
     }
     
@@ -279,6 +290,7 @@ class CalculatorViewModel: ObservableObject {
                 }
             }
             if infix_Expr.isEmpty || isRawExpr() {
+                print("설마")
                 return
             }
             historyExpr = displayExpr.enumerated().map { index, item in
@@ -379,7 +391,15 @@ class CalculatorViewModel: ObservableObject {
         }
         else if button == .perc {
             if !isError {
-                
+                if infix_Expr.isEmpty {
+                    infix_Expr.append("0")
+                }
+                if !endsWithNumber() {
+                    infix_Expr.removeLast()
+                    displayExpr.removeLast()
+                }
+                infix_Expr.append("%")
+                displayExpr.append("%")
             }
         }
         else if button == .lbrac {
@@ -563,3 +583,8 @@ class CalculatorViewModel: ObservableObject {
     }
 }
 
+extension Array {
+    var secondToLast: Element? {
+        count > 1 ? self[count - 2] : nil
+    }
+}
