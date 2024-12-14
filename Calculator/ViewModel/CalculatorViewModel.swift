@@ -12,6 +12,7 @@ class CalculatorViewModel: ObservableObject {
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
     @Published var id = UUID()  //  현재 식에 설정되는 UUID
+    @Published var btnSize: CGFloat = 0
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
     
@@ -88,7 +89,7 @@ class CalculatorViewModel: ObservableObject {
                 stack.append(i)
             }
             else {
-                if let str2 = stack.last, let str1 = stack.secondToLast,
+                if let str2 = stack.last, let str1 = stack.secondLast,
                    let num1 = Decimal(string: str1), let num2 = Decimal(string: str2) {
                     stack.removeLast(); stack.removeLast()
                     if i == "+"{
@@ -234,8 +235,12 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr.append("0")
                 }
                 if !endsWithNumber() {
-                    infix_Expr.removeLast()
-                    displayExpr.removeLast()
+                    if let lastValue = infix_Expr.last {
+                        if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
+                            infix_Expr.removeLast()
+                            displayExpr.removeLast()
+                        }
+                    }
                 }
                 infix_Expr.append("+")
                 displayExpr.append("+")
@@ -247,8 +252,12 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr.append("0")
                 }
                 if !endsWithNumber() {
-                    infix_Expr.removeLast()
-                    displayExpr.removeLast()
+                    if let lastValue = infix_Expr.last {
+                        if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
+                            infix_Expr.removeLast()
+                            displayExpr.removeLast()
+                        }
+                    }
                 }
                 infix_Expr.append("-")
                 displayExpr.append("-")
@@ -260,8 +269,12 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr.append("0")
                 }
                 if !endsWithNumber() {
-                    infix_Expr.removeLast()
-                    displayExpr.removeLast()
+                    if let lastValue = infix_Expr.last {
+                        if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
+                            infix_Expr.removeLast()
+                            displayExpr.removeLast()
+                        }
+                    }
                 }
                 infix_Expr.append("×")
                 displayExpr.append("×")
@@ -273,8 +286,12 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr.append("0")
                 }
                 if !endsWithNumber() {
-                    infix_Expr.removeLast()
-                    displayExpr.removeLast()
+                    if let lastValue = infix_Expr.last {
+                        if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
+                            infix_Expr.removeLast()
+                            displayExpr.removeLast()
+                        }
+                    }
                 }
                 infix_Expr.append("÷")
                 displayExpr.append("÷")
@@ -584,7 +601,7 @@ class CalculatorViewModel: ObservableObject {
 }
 
 extension Array {
-    var secondToLast: Element? {
+    var secondLast: Element? {
         count > 1 ? self[count - 2] : nil
     }
 }
