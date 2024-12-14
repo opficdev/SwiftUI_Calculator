@@ -22,18 +22,20 @@ struct PortraitView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
                             Text(calcVM.historyExpr.joined())
-                                .font(.system(size: 40))
+                                .font(.system(size: calcVM.btnSize * 0.7))
                                 .foregroundColor(Color.gray)
+                                .minimumScaleFactor(0.5)
                                 .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                         }
                     }
+                    .frame(height: calcVM.btnSize * 0.7)  //  ScrollView 내부 Text와 크기 같을 것
                     .scaleEffect(x: -1, y: 1)
 //                    .disabled()
                     ScrollView(.horizontal, showsIndicators: false) {
                         if calcVM.currentAC {   //  계산이 완료됨
                             if let answer = calcVM.displayExpr.first {
                                 Text(calcVM.setNumberFmt(number: answer, round: true, portrait: true))
-                                    .font(.system(size: 70))
+                                    .font(.system(size: calcVM.btnSize))
                                     .foregroundColor(Color.white)
                                     .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                             }
@@ -57,7 +59,6 @@ struct PortraitView: View {
                         }
                     }
                     .scaleEffect(x: -1, y: 1)
-                    .border(Color.white)
 //                    .disabled()
                     VStack {
                         ForEach(btnData, id: \.self) { col in
@@ -66,7 +67,7 @@ struct PortraitView: View {
                                     Button(action: {
                                         calcVM.handleButtonPress(button)
                                     }) {
-                                        ButtonLabelView(button: button.BtnDisplay)  // size는 16 Pro 기준
+                                        ButtonLabelView(button: button.BtnDisplay)
                                             .frame(width: geometry.size.width / CGFloat(col.count) - 8,   // 8은 .padding()의 기본값
                                                    height: isScientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
                                                     geometry.size.width / CGFloat(col.count) - 8,
@@ -87,6 +88,9 @@ struct PortraitView: View {
                                             }
                                         }
                                     )
+                                    .onAppear {
+                                        calcVM.btnSize = geometry.size.width / CGFloat(col.count) - 16
+                                    }
                                 }
                             }
                         }
