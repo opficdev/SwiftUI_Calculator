@@ -124,7 +124,6 @@ class CalculatorViewModel: ObservableObject {
                     isError = true
                     return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
                 }
-                print(displayExpr)
             }
         }
         return [stack.removeLast()]
@@ -302,12 +301,13 @@ class CalculatorViewModel: ObservableObject {
                 let bracGap = infix_Expr.filter({ $0 == "(" }).count - infix_Expr.filter({ $0 == ")" }).count
                 if bracGap < 0 {
                     infix_Expr = Array(repeating: "(", count: -bracGap) + infix_Expr
-                } else {
+                }
+                else {
                     infix_Expr += Array(repeating: ")", count: bracGap)
                 }
+                displayExpr = infix_Expr
             }
             if infix_Expr.isEmpty || isRawExpr() {
-                print("설마")
                 return
             }
             historyExpr = displayExpr.enumerated().map { index, item in
