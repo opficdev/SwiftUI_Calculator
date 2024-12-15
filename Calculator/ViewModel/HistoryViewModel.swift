@@ -25,45 +25,57 @@ class HistoryViewModel: ObservableObject {
     private let historyDataRelay = BehaviorRelay<[String: [History]]>(value: [:])
     
     init() {
-        //  UserDefaults의 변화를 HistoryData 변수에 즉시 동기화 시킴
+        // NotificationCenter를 통해 UserDefaults 변경 알림을 구독
         NotificationCenter.default.rx.notification(UserDefaults.didChangeNotification)
+            // MainScheduler에서 이벤트를 처리하도록 스케줄러 설정
             .observe(on: MainScheduler.instance)
+            // 알림을 받을 때 실행될 클로저 정의
             .subscribe(onNext: { [weak self] _ in
+                // self가 해제되었는지 확인, 해제된 경우 실행 중지
                 guard let self = self else { return }
                 if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
                     for dateString in dateArr {
                         if let data = UserDefaults.standard.data(forKey: dateString),
                            let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data) {
+                               // 메인 스레드에서 UI 업데이트를 위해 동기화 작업 실행
                                DispatchQueue.main.async {
+                                   // Relay를 통해 Rx 기반 데이터 스트림 업데이트
                                    self.historyDataRelay.accept(decodeData)
+                                   // 로컬 변수에도 데이터 업데이트
                                    self.historyData = decodeData
                             }
                         }
                     }
                 }
             })
+            // 메모리 누수를 방지하기 위해 disposeBag에 구독 저장
             .disposed(by: disposeBag)
+
         
 //  MARK: Combime 코드
+//        // NotificationCenter를 통해 UserDefaults 변경 알림을 구독
 //        NotificationCenter.Publisher(center: NotificationCenter.default, name: UserDefaults.didChangeNotification)
+//            // 클로저를 통해 알림을 받을 때 실행될 동작 정의
 //            .sink { [weak self] _ in
-//            guard let self = self else { return }
-//            
-//            // UserDefaults에서 "dateArr" 키로 저장된 배열을 가져오기
-//            if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
-//                // dateArr 배열을 순회하며 데이터 가져오기
-//                for dateString in dateArr {
-//                    if let data = UserDefaults.standard.data(forKey: dateString),
-//                       let decodedData = try? JSONDecoder().decode([String: [History]].self, from: data) {
-//                        // 디코딩된 데이터를 main 스레드에서 처리
-//                        DispatchQueue.main.async {
-//                            self.historyData = decodedData
+//                // self가 해제되었는지 확인, 해제된 경우 실행 중지
+//                guard let self = self else { return }
+//
+//                if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String] {
+//                    for dateString in dateArr {
+//                        if let data = UserDefaults.standard.data(forKey: dateString),
+//                           let decodedData = try? JSONDecoder().decode([String: [History]].self, from: data) {
+//                            // 메인 스레드에서 UI 업데이트를 위해 동기화 작업 실행
+//                            DispatchQueue.main.async {
+//                                // 로컬 변수에 디코딩된 데이터 업데이트
+//                                self.historyData = decodedData
+//                            }
 //                        }
 //                    }
 //                }
 //            }
-//        }
-//        .store(in: &cancellables) // 구독을 저장하여 해제되지 않도록 합니다
+//            // 메모리 누수를 방지하기 위해 구독 저장
+//            .store(in: &cancellables)
+
     }
     
     //  기록 수정 모드에서 선택된 기록의 갯수를 반환
