@@ -129,7 +129,7 @@ class CalculatorViewModel: ObservableObject {
         return [stack.removeLast()]
     }
     
-    private func bracketCorrection() -> Bool { // 괄호 쌍이 안맞을 때
+    func bracketCorrection() -> Bool { // 괄호 쌍이 안맞을 때
         var stack: [String] = infix_Expr.filter { $0 == "(" || $0 == ")" }
         
         while stack.count > 0 {
