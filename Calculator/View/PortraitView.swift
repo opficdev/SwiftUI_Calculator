@@ -23,7 +23,6 @@ struct PortraitView: View {
                         Text(calcVM.historyExpr.joined())
                             .font(.system(size: calcVM.btnSize * 0.7))
                             .foregroundColor(Color.gray)
-                            .minimumScaleFactor(0.5)
                             .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                     }
                     .frame(height: calcVM.btnSize * 0.7)  //  ScrollView 내부 Text와 크기 같을 것
@@ -40,7 +39,7 @@ struct PortraitView: View {
                         }
                         else {
                             HStack(spacing: 0) {
-                                ForEach(Array(calcVM.displayExpr.reversed().enumerated()), id: \.offset) { index, element in
+                                ForEach(Array(calcVM.displayExpr.enumerated()), id: \.offset) { index, element in
                                     Text(
                                         calcVM.setNumberFmt(
                                             number: element,
@@ -48,12 +47,16 @@ struct PortraitView: View {
                                             portrait: true
                                         )
                                     )
-                                    .font(.system(size: 70))
+                                    .font(.system(size: calcVM.btnSize))
                                     .foregroundColor(Color.white)
-                                    .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                                 }
-
+                                if !calcVM.bracketCorrection() {
+                                    Text(")")
+                                        .font(.system(size: calcVM.btnSize))
+                                        .foregroundColor(Color.gray)
+                                }
                             }
+                            .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                         }
                     }
                     .scaleEffect(x: -1, y: 1)
