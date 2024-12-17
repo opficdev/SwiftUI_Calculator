@@ -8,13 +8,18 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
+    @Published var scientific = false //    공학 모드 - UserDefaults에 넣어야 함
+    @Published var unitConversion = false //    단위 변환 모드 - UserDefaults에 넣어야 함
+    
     @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
     @Published var id = UUID()  //  현재 식에 설정되는 UUID
     @Published var btnSize: CGFloat = 0
+    @Published var modeOn = false
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
+    var rbracketAddCount = 0
     
     private var today: String {
         let formatter = DateFormatter()
@@ -145,6 +150,7 @@ class CalculatorViewModel: ObservableObject {
                 break
             }
         }
+        rbracketAddCount = stack.count
         return stack.count == 0
     }
     
@@ -520,7 +526,7 @@ class CalculatorViewModel: ObservableObject {
             // 랜덤 값 처리
         }
         else if button == .emoji {
-            
+            modeOn = true
         }
         else { //  숫자 버튼을 눌렀을 때
             if let num: String = button.BtnDisplay.string {
