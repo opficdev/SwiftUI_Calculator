@@ -10,7 +10,6 @@ import UIKit
 
 struct PortraitView: View {
     @EnvironmentObject var calcVM: CalculatorViewModel
-    @Binding var isScientific: Bool
     @State private var btnData: [[BtnType]] = []
     
     var body: some View {
@@ -51,7 +50,7 @@ struct PortraitView: View {
                                     .foregroundColor(Color.white)
                                 }
                                 if !calcVM.bracketCorrection() {
-                                    Text(")")
+                                    Text(String(repeating: ")", count: calcVM.rbracketAddCount))
                                         .font(.system(size: calcVM.btnSize))
                                         .foregroundColor(Color.gray)
                                 }
@@ -70,14 +69,14 @@ struct PortraitView: View {
                                     }) {
                                         ButtonLabelView(button: button.BtnDisplay)
                                             .frame(width: geometry.size.width / CGFloat(col.count) - 8,   // 8은 .padding()의 기본값
-                                                   height: isScientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
+                                                   height: calcVM.scientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
                                                     geometry.size.width / CGFloat(col.count) - 8,
                                                    alignment: .center
                                             )
-                                            .background(button.backgroundColor)
+                                            .background(calcVM.modeOn && button == BtnType.emoji ? Color.clear : button.backgroundColor)
                                             .cornerRadius(geometry.size.width / CGFloat(col.count) - 8)
                                             .foregroundColor(Color.white)
-                                            .font(.system(size: (isScientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
+                                            .font(.system(size: (calcVM.scientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
                                                                     geometry.size.width / CGFloat(col.count) - 8) * 0.4)
                                             )
                                     }
@@ -86,8 +85,8 @@ struct PortraitView: View {
                                             .onEnded { _ in
                                                 if button == BtnType.clear {
                                                     calcVM.handleButtonPress(BtnType.allClear)
+                                                }
                                             }
-                                        }
                                     )
                                     .onAppear {
                                         calcVM.btnSize = geometry.size.width / CGFloat(col.count) - 16
@@ -97,24 +96,20 @@ struct PortraitView: View {
                         }
                     }
                 }
-            }
-            .onAppear {
-                btnData = isScientific ? scientificBtn + portraitBtn : portraitBtn
-                btnData[isScientific ? 5 : 0][0] = calcVM.currentAC ? .allClear : .clear
-            }
-            .onChange(of: calcVM.currentAC) { newValue in
-                if newValue {
-                    btnData[isScientific ? 5 : 0][0] = .allClear
+                .onAppear {
+                    btnData = calcVM.scientific ? scientificBtn + portraitBtn : portraitBtn
+                    btnData[calcVM.scientific ? 5 : 0][0] = calcVM.currentAC ? .allClear : .clear
                 }
-                else {
-                    btnData[isScientific ? 5 : 0][0] = .clear
+                .onChange(of: calcVM.currentAC) { newValue in
+                    if newValue {
+                        btnData[calcVM.scientific ? 5 : 0][0] = .allClear
+                    }
+                    else {
+                        btnData[calcVM.scientific ? 5 : 0][0] = .clear
+                    }
                 }
             }
         }
     }
 }
 
-#Preview {
-    PortraitView(isScientific: .constant(false))
-        .environmentObject(CalculatorViewModel())
-}
