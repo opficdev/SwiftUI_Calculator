@@ -21,7 +21,7 @@ struct PortraitView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         Text(calcVM.historyExpr.joined())
                             .font(.system(size: calcVM.btnSize * 0.7))
-                            .foregroundColor(Color.gray)
+                            .foregroundStyle(Color.gray)
                             .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                     }
                     .frame(height: calcVM.btnSize * 0.7)  //  ScrollView 내부 Text와 크기 같을 것
@@ -32,7 +32,7 @@ struct PortraitView: View {
                             if let answer = calcVM.displayExpr.first {
                                 Text(calcVM.setNumberFmt(number: answer, round: true, portrait: true))
                                     .font(.system(size: calcVM.btnSize))
-                                    .foregroundColor(Color.white)
+                                    .foregroundStyle(Color.white)
                                     .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                             }
                         }
@@ -47,12 +47,12 @@ struct PortraitView: View {
                                         )
                                     )
                                     .font(.system(size: calcVM.btnSize))
-                                    .foregroundColor(Color.white)
+                                    .foregroundStyle(Color.white)
                                 }
                                 if !calcVM.bracketCorrection() {
                                     Text(String(repeating: ")", count: calcVM.rbracketAddCount))
                                         .font(.system(size: calcVM.btnSize))
-                                        .foregroundColor(Color.gray)
+                                        .foregroundStyle(Color.gray)
                                 }
                             }
                             .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
@@ -75,7 +75,7 @@ struct PortraitView: View {
                                             )
                                             .background(calcVM.modeOn && button == BtnType.emoji ? Color.clear : button.backgroundColor)
                                             .cornerRadius(geometry.size.width / CGFloat(col.count) - 8)
-                                            .foregroundColor(Color.white)
+                                            .foregroundStyle(Color.white)
                                             .font(.system(size: (calcVM.scientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
                                                                     geometry.size.width / CGFloat(col.count) - 8) * 0.4)
                                             )

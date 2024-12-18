@@ -24,7 +24,7 @@ struct HistoryView: View {
                 }
                 .font(.title3)
                 .fontWeight(.semibold)
-                .foregroundColor(historyVM.modifyHistory ? Color.clear : Color.orange)
+                .foregroundStyle(historyVM.modifyHistory ? Color.clear : Color.orange)
                 .disabled(historyVM.modifyHistory)
                 .padding()
             }
@@ -36,7 +36,7 @@ struct HistoryView: View {
                                let date = historyVM.relativeDateString(for: dateString) {
                                 LazyVStack(alignment: .leading, spacing: 0) {
                                     Text(date)
-                                        .foregroundColor(Color.gray)
+                                        .foregroundStyle(Color.gray)
                                         .font(.title3)
                                         .padding([.bottom, .leading])
                                     ForEach(arr.indices, id: \.self) { idx in
@@ -47,12 +47,12 @@ struct HistoryView: View {
                                                 } label: {
                                                     if arr[idx].isChecked {
                                                         Image(systemName: "checkmark.circle.fill")
-                                                            .foregroundColor(Color.orange)
+                                                            .foregroundStyle(Color.orange)
                                                             .font(.title3)
                                                     }
                                                     else {
                                                         Image(systemName: "circle")
-                                                            .foregroundColor(Color.gray)
+                                                            .foregroundStyle(Color.gray)
                                                             .font(.title3)
                                                     }
                                                 }
@@ -63,10 +63,10 @@ struct HistoryView: View {
                                                 Divider()
                                                     .padding(.bottom)
                                                 Text(arr[idx].historyExpr.joined())
-                                                    .foregroundColor(Color.gray)
+                                                    .foregroundStyle(Color.gray)
                                                 Text(historyVM.setNumberFmt(string: arr[idx].displayExpr.joined(), style: .decimal))
                                                     .font(.title3)
-                                                    .foregroundColor(Color.white)
+                                                    .foregroundStyle(Color.white)
                                                 Divider()
                                                     .padding(.top)
                                             }
@@ -104,14 +104,14 @@ struct HistoryView: View {
                                         historyVM.resetCheck()
                                     } label: {
                                         Text("완료")
-                                            .foregroundColor(Color.orange)
+                                            .foregroundStyle(Color.orange)
                                     }
                                     Spacer()
                                     Button {
                                         historyVM.removeAlert = true
                                     } label: {
                                         Text("삭제")
-                                            .foregroundColor(historyVM.selectedCount == 0 ? Color.gray : Color.red)
+                                            .foregroundStyle(historyVM.selectedCount == 0 ? Color.gray : Color.red)
                                     }
                                     .disabled(historyVM.selectedCount == 0)
                                 }
@@ -122,14 +122,14 @@ struct HistoryView: View {
                                         }
                                     } label: {
                                         Text("편집")
-                                            .foregroundColor(Color.orange)
+                                            .foregroundStyle(Color.orange)
                                     }
                                     Spacer()
                                     Button {
                                         historyVM.removeAllAlert = true
                                     } label: {
                                         Text("지우기")
-                                            .foregroundColor(.red)
+                                            .foregroundStyle(.red)
                                     }
                                 }
                             }
@@ -180,7 +180,7 @@ struct HistoryView: View {
                             .font(.system(size: 20))
                     }
                 }
-                .foregroundColor(Color.gray)
+                .foregroundStyle(Color.gray)
                 Spacer()
             }
         }
