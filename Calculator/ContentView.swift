@@ -32,13 +32,12 @@ struct ContentView: View {
                 }, label: {
                     Image(systemName: "list.bullet")
                         .font(.system(size: 22))
-                        .foregroundColor(Color.orange)
+                        .foregroundStyle(Color.orange)
                 })
-                .padding()
+                .padding(12)
 //            if orientation.isPortrait {
                 PortraitView()
                     .environmentObject(calcVM)
-                    .padding()
                     .padding(.bottom)
 //                }
 //                else {  //가로모드
