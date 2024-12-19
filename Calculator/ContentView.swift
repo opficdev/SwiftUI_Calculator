@@ -34,7 +34,6 @@ struct ContentView: View {
                         .font(.system(size: 22))
                         .foregroundStyle(Color.orange)
                 })
-                .padding(12)
 //            if orientation.isPortrait {
                 PortraitView()
                     .environmentObject(calcVM)
@@ -45,6 +44,7 @@ struct ContentView: View {
 //                }
                 
             }
+            .padding()
             .sheet(isPresented: $historyVM.showSheet) {
                 HistoryView()
                     .environmentObject(historyVM)
