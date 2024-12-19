@@ -8,9 +8,17 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
-    @Published var scientific = false //    공학 모드 - UserDefaults에 넣어야 함
-    @Published var unitConversion = false //    단위 변환 모드 - UserDefaults에 넣어야 함
-    
+//    @Published var scientific = false //
+    @Published var scientific = UserDefaults.standard.bool(forKey: "scientific") {
+        didSet {
+            UserDefaults.standard.set(scientific, forKey: "scientific")
+        }
+    }
+    @Published var unitConversion = UserDefaults.standard.bool(forKey: "unitConversion") {
+        didSet {
+            UserDefaults.standard.set(unitConversion, forKey: "unitConversion")
+        }
+    }
     @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
@@ -29,6 +37,10 @@ class CalculatorViewModel: ObservableObject {
     
     var isEmpty: Bool {
         return infix_Expr.isEmpty
+    }
+    
+    var exprFontSize: CGFloat {
+        return min(btnSize, btnSize)
     }
     
     // 연산자 우선순위
@@ -241,7 +253,7 @@ class CalculatorViewModel: ObservableObject {
                 }
                 if !endsWithNumber() {
                     if let lastValue = infix_Expr.last {
-                        if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
+                        if priority(lastValue) != 0 && lastValue != "%" { //    lastValue가 괄호가 아닐 때 and % 아닐 때
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
