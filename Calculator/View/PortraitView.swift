@@ -20,7 +20,7 @@ struct PortraitView: View {
                     Spacer()
                     ScrollView(.horizontal, showsIndicators: false) {
                         Text(calcVM.historyExpr.joined())
-                            .font(.system(size: calcVM.btnSize * 0.7))
+                            .font(.system(size: calcVM.btnSize * 0.5))
                             .foregroundStyle(Color.gray)
                             .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
                     }
@@ -60,6 +60,7 @@ struct PortraitView: View {
                     }
                     .scaleEffect(x: -1, y: 1)
 //                    .disabled()
+                    .padding(.bottom)
                     VStack {
                         ForEach(btnData, id: \.self) { col in
                             HStack {
@@ -76,7 +77,7 @@ struct PortraitView: View {
                                             .background(calcVM.modeOn && button == BtnType.emoji ? Color.clear : button.backgroundColor)
                                             .cornerRadius(geometry.size.width / CGFloat(col.count) - 8)
                                             .foregroundStyle(Color.white)
-                                            .font(.system(size: (calcVM.scientific ? (geometry.size.height * 2) / (3 * CGFloat(btnData.count)) - 8 :
+                                            .font(.system(size: (calcVM.scientific ? (geometry.size.width * 2) / (3 * CGFloat(btnData.count)):
                                                                     geometry.size.width / CGFloat(col.count) - 8) * 0.4)
                                             )
                                     }
@@ -97,6 +98,10 @@ struct PortraitView: View {
                     }
                 }
                 .onAppear {
+                    btnData = calcVM.scientific ? scientificBtn + portraitBtn : portraitBtn
+                    btnData[calcVM.scientific ? 5 : 0][0] = calcVM.currentAC ? .allClear : .clear
+                }
+                .onChange(of: calcVM.scientific) { _ in
                     btnData = calcVM.scientific ? scientificBtn + portraitBtn : portraitBtn
                     btnData[calcVM.scientific ? 5 : 0][0] = calcVM.currentAC ? .allClear : .clear
                 }
