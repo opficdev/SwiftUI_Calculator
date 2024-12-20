@@ -8,7 +8,6 @@
 import SwiftUI
 
 class CalculatorViewModel: ObservableObject {
-//    @Published var scientific = false //
     @Published var scientific = UserDefaults.standard.bool(forKey: "scientific") {
         didSet {
             UserDefaults.standard.set(scientific, forKey: "scientific")
@@ -22,26 +21,17 @@ class CalculatorViewModel: ObservableObject {
     @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
     @Published var currentAC = true // AC 버튼 on off
     @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
-    @Published var id = UUID()  //  현재 식에 설정되는 UUID
+    @Published var id = UUID()  //  현재 수식에 설정되는 UUID
     @Published var btnSize: CGFloat = 0
     @Published var modeOn = false
     private var infix_Expr:[String] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
-    var rbracketAddCount = 0
-    
     private var today: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: Date())
     }
-    
-    var isEmpty: Bool {
-        return infix_Expr.isEmpty
-    }
-    
-    var exprFontSize: CGFloat {
-        return min(btnSize, btnSize)
-    }
+    var rbracketAddCount = 0
     
     // 연산자 우선순위
     private func priority(_ op: String) -> Int {
@@ -146,6 +136,12 @@ class CalculatorViewModel: ObservableObject {
         return [stack.removeLast()]
     }
     
+    private func isRawExpr() -> Bool {
+        return !infix_Expr.contains {
+            ["+", "-", "×", "÷", "%"].contains($0)  //  priority()로 어떻게 할 수 있을듯?
+        }
+    }
+    
     func bracketCorrection() -> Bool { // 괄호 쌍이 안맞을 때
         var stack: [String] = infix_Expr.filter { $0 == "(" || $0 == ")" }
         
@@ -229,20 +225,14 @@ class CalculatorViewModel: ObservableObject {
         return fmt.string(for: Decimal(string: decimal)) ?? number
     }
     
-    private func isRawExpr() -> Bool {
-        return !infix_Expr.contains {
-            ["+", "-", "×", "÷", "%"].contains($0)  //  priority()로 어떻게 할 수 있을듯?
+    func scrollUnavailable(innerWidth: CGFloat, outerWidth: CGFloat) -> Bool {
+        if currentAC {
+            let sizeArr = (0...9).reversed().map { Double($0) * 0.1 }
+            for num in sizeArr {
+                
+            }
         }
-    }
-    
-    func exprNumberCount(expr: [String]) -> Int {
-        let string = expr.joined() //  수식에서 숫자인것만 필터링 해서 문자열로
-        return string.count - string.count { $0 == "." || priority(String($0)) != -1 } // 소수점과 다른 괄호같은 건 제거해야함
-    }
-
-    func isContains(string: String) -> Bool {
-        let stringValue = string.replacingOccurrences(of: ",", with: "")
-        return infix_Expr.contains(stringValue)
+        return innerWidth <= outerWidth
     }
     
     func handleButtonPress(_ button: BtnType) {
@@ -562,7 +552,7 @@ class CalculatorViewModel: ObservableObject {
                             }
                         }
                         else if currentAC {
-                            historyExpr.removeAll()
+//                            historyExpr.removeAll()
                             infix_Expr = [num]
                         }
                         else {
@@ -613,7 +603,7 @@ class CalculatorViewModel: ObservableObject {
         }
         
         if !currentAC { //  !currentAC는 현재 수식이 입력 중이라는 것을 의미함
-            historyExpr.removeAll()
+//            historyExpr.removeAll()
         }
     }
 }
