@@ -163,7 +163,7 @@ class CalculatorViewModel: ObservableObject {
     }
     
     func setNumberFmt(number: String, round: Bool = false, portrait: Bool) -> String {
-        if -1 < priority(number) {  //  실수형 아님
+        if -1 < priority(number) || isError {  //  실수형 아님 or 계산 오류일 시
             return number
         }
         let fmt = NumberFormatter()
