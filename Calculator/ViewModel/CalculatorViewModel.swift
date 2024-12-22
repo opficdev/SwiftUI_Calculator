@@ -166,6 +166,7 @@ class CalculatorViewModel: ObservableObject {
         if -1 < priority(number) || isError {  //  실수형 아님 or 계산 오류일 시
             return number
         }
+        
         let fmt = NumberFormatter()
         
         if round {
@@ -220,7 +221,7 @@ class CalculatorViewModel: ObservableObject {
         if let dotIndex = number.firstIndex(of: ".") {
             decimal = String(number[..<dotIndex])
             let fraction = String(number[dotIndex...])
-            return (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction
+            return  (decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction
         }
         return fmt.string(for: Decimal(string: decimal)) ?? number
     }
