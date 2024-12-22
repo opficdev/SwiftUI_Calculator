@@ -220,13 +220,11 @@ class CalculatorViewModel: ObservableObject {
         var decimal = number
         fmt.numberStyle = .decimal
         if let dotIndex = number.firstIndex(of: ".") {
-            print("decimal: \(decimal)")
             decimal = String(number[..<dotIndex])
             let fraction = String(number[dotIndex...])
-            print((decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction)
-            return (decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction
+            return (decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal))!) + fraction
         }
-        return fmt.string(for: Decimal(string: decimal)) ?? number
+        return (decimal.contains("-") ? "-" : "") + fmt.string(for: Decimal(string: decimal))!
     }
     
     func scrollUnavailable(innerWidth: CGFloat, outerWidth: CGFloat) -> Bool {
