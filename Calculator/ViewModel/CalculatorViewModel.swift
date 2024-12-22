@@ -216,22 +216,25 @@ class CalculatorViewModel: ObservableObject {
                 }
             }
         }
+        
         var decimal = number
         fmt.numberStyle = .decimal
         if let dotIndex = number.firstIndex(of: ".") {
+            print("decimal: \(decimal)")
             decimal = String(number[..<dotIndex])
             let fraction = String(number[dotIndex...])
-            return  (decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction
+            print((decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction)
+            return (decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal)) ?? number) + fraction
         }
         return fmt.string(for: Decimal(string: decimal)) ?? number
     }
     
     func scrollUnavailable(innerWidth: CGFloat, outerWidth: CGFloat) -> Bool {
         if currentAC {
-            let sizeArr = (0...9).reversed().map { Double($0) * 0.1 }
-            for num in sizeArr {
-                
-            }
+//            let sizeArr = (0...9).reversed().map { Double($0) * 0.1 }
+//            for num in sizeArr {
+//                
+//            }
         }
         return innerWidth <= outerWidth
     }
@@ -367,12 +370,10 @@ class CalculatorViewModel: ObservableObject {
             displayExpr.removeLast()
             if !infix_Expr.isEmpty {
                 let last = infix_Expr.removeLast()
-                if let _num = Int(last) {    // 문자열이 Int 형변환이 되면
-                    let num = String(_num)
-                    if num.count > 1 {  // 숫자가 2자리 이상인 경우
-                        let index = num.index(num.endIndex, offsetBy: -1)
-                        let tmp = String(num[..<index])
-                        infix_Expr.append(tmp)
+                if priority(last) == -1 && !isError {
+                    if last.count > 1 {
+                        let index = last.index(last.endIndex, offsetBy: -1)
+                        infix_Expr.append(String(last[..<index]))
                     }
                     displayExpr = infix_Expr
                 }
@@ -380,6 +381,7 @@ class CalculatorViewModel: ObservableObject {
             if displayExpr.isEmpty {
                 displayExpr = ["0"]
             }
+            
         }
         else if button == .dot {
             if isError || infix_Expr.isEmpty {
