@@ -217,14 +217,15 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         
-        var decimal = number
         fmt.numberStyle = .decimal
-        if let dotIndex = number.firstIndex(of: ".") {
-            decimal = String(number[..<dotIndex])
-            let fraction = String(number[dotIndex...])
-            return (decimal.contains("-") ? "-" : "") + (fmt.string(for: Decimal(string: decimal))!) + fraction
+        
+        let dotIndex = number.firstIndex(of: ".") ?? number.endIndex
+        var returnValue = fmt.string(for: Decimal(string: String(number[..<dotIndex])))!
+        let fraction = String(number[dotIndex...])
+        if number.contains("-") && returnValue.first != "-" {
+            returnValue = "-" + returnValue
         }
-        return (decimal.contains("-") ? "-" : "") + fmt.string(for: Decimal(string: decimal))!
+        return returnValue + fraction
     }
     
     func scrollUnavailable(innerWidth: CGFloat, outerWidth: CGFloat) -> Bool {
