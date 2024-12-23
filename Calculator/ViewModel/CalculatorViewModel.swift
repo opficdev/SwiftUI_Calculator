@@ -162,8 +162,8 @@ class CalculatorViewModel: ObservableObject {
         return stack.count == 0
     }
     
-    func setNumberFmt(number: String, round: Bool = false, portrait: Bool) -> String {
-        if -1 < priority(number) || isError {  //  실수형 아님 or 계산 오류일 시
+    func setNumberFmt(number: String, round: Bool = false, portrait: Bool, historic: Bool = false) -> String {
+        if -1 < priority(number) || isError {  //  숫자 아님 or 계산 오류일 시
             return number
         }
         
@@ -221,6 +221,9 @@ class CalculatorViewModel: ObservableObject {
         
         let dotIndex = number.firstIndex(of: ".") ?? number.endIndex
         var returnValue = fmt.string(for: Decimal(string: String(number[..<dotIndex])))!
+        if historic && returnValue.last == "." {    // history일 경우에는 n. 형태로 나오지 않게 함
+            returnValue.removeLast()
+        }
         let fraction = String(number[dotIndex...])
         if number.contains("-") && returnValue.first != "-" {
             returnValue = "-" + returnValue
@@ -325,7 +328,8 @@ class CalculatorViewModel: ObservableObject {
                 setNumberFmt(
                     number: item,
                     round: displayExpr.count > 1 && index == 0,
-                    portrait: true
+                    portrait: true,
+                    historic: true
                 )
             }
             displayExpr = calculation()
