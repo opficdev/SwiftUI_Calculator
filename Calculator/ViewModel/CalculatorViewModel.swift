@@ -18,8 +18,9 @@ class CalculatorViewModel: ObservableObject {
             UserDefaults.standard.set(unitConversion, forKey: "unitConversion")
         }
     }
-    @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
+//    @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
 //    @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
+    @Published var historyExpr: [Token] = [] // 회색으로 나타나는 기존 계산식
     @Published var displayExpr: [Token] = [Token(value: "0", automatic: false)]
     @Published var currentAC = true // AC 버튼 on off
     @Published var id = UUID()  //  현재 수식에 설정되는 UUID
@@ -245,7 +246,8 @@ class CalculatorViewModel: ObservableObject {
     
     func tapHistyrExpr() {
         currentAC = false
-        infix_Expr = historyExpr.map { Token(value: $0, automatic: false) }
+//        infix_Expr = historyExpr.map { Token(value: $0, automatic: false) }
+        infix_Expr = historyExpr
         displayExpr = infix_Expr
         historyExpr.removeAll()
     }
@@ -333,16 +335,17 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-            historyExpr = displayExpr.enumerated().map { index, item in
-                var modItem = item  // 복사본 생성
-                modItem.automatic = false  // 복사본 수정
-                return setNumberFmt(
-                    number: modItem.value,
-                    round: displayExpr.count > 1 && index == 0,
-                    portrait: true,
-                    historic: true
-                )
-            }
+//            historyExpr = displayExpr.enumerated().map { index, item in
+//                var modItem = item  // 복사본 생성
+//                modItem.automatic = false  // 복사본 수정
+//                return setNumberFmt(
+//                    number: modItem.value,
+//                    round: displayExpr.count > 1 && index == 0,
+//                    portrait: true,
+//                    historic: true
+//                )
+//            }
+            historyExpr = displayExpr
             displayExpr = calculation()
             currentAC = true
             infix_Expr = displayExpr

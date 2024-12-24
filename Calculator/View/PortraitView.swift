@@ -28,7 +28,11 @@ struct PortraitView: View {
                         VStack(spacing: 0) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 if calcVM.currentAC {
-                                    Text(calcVM.historyExpr.joined())
+                                    Text(calcVM.historyExpr.map { calcVM.setNumberFmt(
+                                        number: $0.value,
+                                        round: true,
+                                        portrait: true
+                                    ) }.joined())
                                         .font(.system(size: calcVM.btnSize * 0.5))  // 얘도 수정이 있긴 해야하는데 displayExpr보다는 변화량이 작음
                                         .foregroundStyle(Color.gray)
                                         .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
