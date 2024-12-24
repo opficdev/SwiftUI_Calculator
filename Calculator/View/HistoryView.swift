@@ -62,7 +62,7 @@ struct HistoryView: View {
                                             VStack(alignment: .leading) {
                                                 Divider()
                                                     .padding(.bottom)
-                                                Text(arr[idx].historyExpr.joined())
+                                                Text(arr[idx].historyExpr.map{ historyVM.setNumberFmt(string: $0.value, style: .decimal) }.joined())
                                                     .foregroundStyle(Color.gray)
                                                 Text(historyVM.setNumberFmt(string: arr[idx].displayExpr.map{$0.value}.joined(), style: .decimal))
                                                     .font(.title3)
