@@ -243,6 +243,13 @@ class CalculatorViewModel: ObservableObject {
         return innerWidth <= outerWidth
     }
     
+    func tapHistyrExpr() {
+        currentAC = false
+        infix_Expr = historyExpr.map { Token(value: $0, automatic: false) }
+        displayExpr = infix_Expr
+        historyExpr.removeAll()
+    }
+    
     func handleButtonPress(_ button: BtnType) {
         if button == .add {
             if !isError {

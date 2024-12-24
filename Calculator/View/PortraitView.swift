@@ -26,77 +26,76 @@ struct PortraitView: View {
                                 .foregroundStyle(Color.white)
                         }
                         VStack(spacing: 0) {
-                            Group {
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    if calcVM.currentAC {
-                                        Text(calcVM.historyExpr.joined())
-                                            .font(.system(size: calcVM.btnSize * 0.5))  // 얘도 수정이 있긴 해야하는데 displayExpr보다는 변화량이 작음
-                                            .foregroundStyle(Color.gray)
-                                            .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
-                                            .background(
-                                                GeometryReader { geo in
-                                                    Color.clear
-                                                        .onAppear {
-                                                            historyWidth = geo.size.width
-                                                        }
-                                                        .onChange(of: calcVM.displayExpr) { _ in
-                                                            historyWidth = geo.size.width
-                                                        }
-                                                }
-                                            )
-                                            .onTapGesture {
-                                                calcVM.currentAC = false
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                if calcVM.currentAC {
+                                    Text(calcVM.historyExpr.joined())
+                                        .font(.system(size: calcVM.btnSize * 0.5))  // 얘도 수정이 있긴 해야하는데 displayExpr보다는 변화량이 작음
+                                        .foregroundStyle(Color.gray)
+                                        .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
+                                        .background(
+                                            GeometryReader { geo in
+                                                Color.clear
+                                                    .onAppear {
+                                                        historyWidth = geo.size.width
+                                                    }
+                                                    .onChange(of: calcVM.displayExpr) { _ in
+                                                        historyWidth = geo.size.width
+                                                    }
                                             }
-                                    }
+                                        )
+                                        .onTapGesture {
+                                            calcVM.tapHistyrExpr()
+                                        }
                                 }
-                                .frame(height: calcVM.btnSize * 0.7)  //  ScrollView 내부 Text와 크기 같을 것
-                                .scaleEffect(x: -1, y: 1)
-                                .disabled(calcVM.scrollUnavailable(innerWidth: historyWidth, outerWidth: geometry.size.width))
-                                
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 0) {
-                                        if calcVM.currentAC {   //  계산이 완료됨
-                                            if let answer = calcVM.displayExpr.first?.value {
-                                                Text(calcVM.setNumberFmt(number: answer, round: true, portrait: true))
-                                                    .font(.system(size: calcVM.btnSize))
-                                                    .foregroundStyle(Color.white)
-                                            }
-                                        }
-                                        else {
-                                            ForEach(Array(calcVM.displayExpr.enumerated()), id: \.offset) { index, element in
-                                                Text(calcVM.setNumberFmt(
-                                                    number: element.value,
-                                                    round: !calcVM.historyExpr.isEmpty && calcVM.displayExpr.count > 1 && index == 0,
-                                                    portrait: true
-                                                ))
-                                                .foregroundStyle(calcVM.displayExpr[index].automatic ? Color.gray : Color.white)
-                                                .font(.system(size: calcVM.btnSize))
-                                                
-                                            }
-                                            if !calcVM.bracketCorrection() {
-                                                Text(String(repeating: ")", count: calcVM.rbracketAddCount))
-                                                    .foregroundStyle(Color.gray)
-                                                    .font(.system(size: calcVM.btnSize))
-                                            }
-                                        }
-                                    }
-                                    .frame(height: calcVM.btnSize)
-                                    .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
-                                    .background(
-                                        GeometryReader { geo in
-                                            Color.clear
-                                                .onAppear {
-                                                    displayWidth = geo.size.width
-                                                }
-                                                .onChange(of: calcVM.displayExpr) { _ in
-                                                    displayWidth = geo.size.width
-                                                }
-                                        }
-                                    )
-                                }
-                                .scaleEffect(x: -1, y: 1)
-                                .disabled(calcVM.scrollUnavailable(innerWidth: displayWidth, outerWidth: geometry.size.width))
                             }
+                            .frame(height: calcVM.btnSize * 0.7)  //  ScrollView 내부 Text와 크기 같을 것
+                            .scaleEffect(x: -1, y: 1)
+                            .scrollDisabled(calcVM.scrollUnavailable(innerWidth: historyWidth, outerWidth: geometry.size.width))
+                            
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 0) {
+                                    if calcVM.currentAC {   //  계산이 완료됨
+                                        if let answer = calcVM.displayExpr.first?.value {
+                                            Text(calcVM.setNumberFmt(number: answer, round: true, portrait: true))
+                                                .font(.system(size: calcVM.btnSize))
+                                                .foregroundStyle(Color.white)
+                                        }
+                                    }
+                                    else {
+                                        ForEach(Array(calcVM.displayExpr.enumerated()), id: \.offset) { index, element in
+                                            Text(calcVM.setNumberFmt(
+                                                number: element.value,
+                                                round: !calcVM.historyExpr.isEmpty && calcVM.displayExpr.count > 1 && index == 0,
+                                                portrait: true
+                                            ))
+                                            .foregroundStyle(calcVM.displayExpr[index].automatic ? Color.gray : Color.white)
+                                            .font(.system(size: calcVM.btnSize))
+                                            
+                                        }
+                                        if !calcVM.bracketCorrection() {
+                                            Text(String(repeating: ")", count: calcVM.rbracketAddCount))
+                                                .foregroundStyle(Color.gray)
+                                                .font(.system(size: calcVM.btnSize))
+                                        }
+                                    }
+                                }
+                                .frame(height: calcVM.btnSize)
+                                .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear {
+                                                displayWidth = geo.size.width
+                                            }
+                                            .onChange(of: calcVM.displayExpr) { _ in
+                                                displayWidth = geo.size.width
+                                            }
+                                    }
+                                )
+                            }
+                            .scaleEffect(x: -1, y: 1)
+                            .scrollDisabled(calcVM.scrollUnavailable(innerWidth: displayWidth, outerWidth: geometry.size.width))
                         }
                     }
                     .padding(.bottom)
