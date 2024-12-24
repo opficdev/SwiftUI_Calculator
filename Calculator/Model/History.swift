@@ -11,9 +11,9 @@ struct History: Hashable, Codable {
     let id: UUID
     var isChecked = false
     let historyExpr: [String]
-    let displayExpr: [String]
+    let displayExpr: [Token]
     
-    init(id: UUID, isChecked: Bool = false, historyExpr: [String], displayExpr: [String]) {
+    init(id: UUID, isChecked: Bool = false, historyExpr: [String], displayExpr: [Token]) {
         self.id = id
         self.isChecked = isChecked
         self.historyExpr = historyExpr
