@@ -19,12 +19,14 @@ class CalculatorViewModel: ObservableObject {
         }
     }
     @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
+//    @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
+    @Published var displayExpr: [Token] = [Token(value: "0", automatic: false)]
     @Published var currentAC = true // AC 버튼 on off
-    @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
     @Published var id = UUID()  //  현재 수식에 설정되는 UUID
     @Published var btnSize: CGFloat = 0
     @Published var modeOn = false
-    private var infix_Expr:[String] = []  // 입력 식(중위)
+//    private var infix_Expr:[String] = []  // 입력 식(중위)
+    private var infix_Expr: [Token] = []  // 입력 식(중위)
     private var isError = false // 현재 계산 중 에러가 발생했는지
     private var today: String {
         let formatter = DateFormatter()
@@ -49,7 +51,7 @@ class CalculatorViewModel: ObservableObject {
     
     // 입력된 식의 마지막이 숫자인지 판별
     private func endsWithNumber() -> Bool {
-        let last = infix_Expr.last
+        let last = infix_Expr.last?.value
         if last == nil || priority(last!) == -1 {
             return true
         }
@@ -60,17 +62,17 @@ class CalculatorViewModel: ObservableObject {
     private func infix_Postfix() -> [String] {
        var postfix:[String] = []
        var stack:[String] = []
-        for i in infix_Expr {
-            if i == "+" || i == "-" || i == "×" || i == "÷" {
-                while !stack.isEmpty && (priority(i) <= priority(stack.last!)){
+        for tokenValue in (infix_Expr.map { $0.value }) {
+            if tokenValue == "+" || tokenValue == "-" || tokenValue == "×" || tokenValue == "÷" {
+                while !stack.isEmpty && (priority(tokenValue) <= priority(stack.last!)){
                     postfix.append(stack.popLast()!)
                 }
-                stack.append(i)
+                stack.append(tokenValue)
             }
-            else if i == "(" {
-                stack.append(i)
+            else if tokenValue == "(" {
+                stack.append(tokenValue)
             }
-            else if i == ")" {
+            else if tokenValue == ")" {
                 var top_op = stack.popLast()!
                 while top_op != "("{
                     postfix.append(top_op)
@@ -78,7 +80,7 @@ class CalculatorViewModel: ObservableObject {
                 }
             }
             else{
-                postfix.append(i)
+                postfix.append(tokenValue)
             }
         }
         while !stack.isEmpty {
@@ -88,7 +90,7 @@ class CalculatorViewModel: ObservableObject {
     }
     
     //변경된 후위표기 식을 스택을 통해 계산
-    private func calculation() -> [String] {
+    private func calculation() -> [Token] {
        let postfix = infix_Postfix()
        var stack:[String] = []
         for i in postfix{
@@ -114,7 +116,7 @@ class CalculatorViewModel: ObservableObject {
                         }
                         else{   // 0으로 나누는 예외처리
                             isError = true
-                            return ["정의되지 않음"]
+                            return [Token(value: "정의되지 않음")]
                         }
                     }
                     else if i == "%" {
@@ -133,17 +135,17 @@ class CalculatorViewModel: ObservableObject {
                 }
             }
         }
-        return [stack.removeLast()]
+        return [Token(value: stack.removeLast())]
     }
     
     private func isRawExpr() -> Bool {
-        return !infix_Expr.contains {
+        return !infix_Expr.map { $0.value } .contains {
             ["+", "-", "×", "÷", "%"].contains($0)  //  priority()로 어떻게 할 수 있을듯?
         }
     }
     
     func bracketCorrection() -> Bool { // 괄호 쌍이 안맞을 때
-        var stack: [String] = infix_Expr.filter { $0 == "(" || $0 == ")" }
+        var stack: [String] = infix_Expr.filter { $0.value == "(" || $0.value == ")" }.map { $0.value }
         
         while stack.count > 0 {
             var count = 0
@@ -245,79 +247,79 @@ class CalculatorViewModel: ObservableObject {
         if button == .add {
             if !isError {
                 if infix_Expr.isEmpty {
-                    infix_Expr.append("0")
+                    infix_Expr.append(Token(value: "0"))
                 }
                 if !endsWithNumber() {
-                    if let lastValue = infix_Expr.last {
+                    if let lastValue = infix_Expr.last?.value {
                         if priority(lastValue) != 0 && lastValue != "%" { //    lastValue가 괄호가 아닐 때 and % 아닐 때
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
                     }
                 }
-                infix_Expr.append("+")
-                displayExpr.append("+")
+                infix_Expr.append(Token(value: "+"))
+                displayExpr.append(Token(value: "+"))
             }
         }
         else if button == .sub {
             if !isError {
                 if infix_Expr.isEmpty {
-                    infix_Expr.append("0")
+                    infix_Expr.append(Token(value: "0"))
                 }
                 if !endsWithNumber() {
-                    if let lastValue = infix_Expr.last {
+                    if let lastValue = infix_Expr.last?.value {
                         if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
                     }
                 }
-                infix_Expr.append("-")
-                displayExpr.append("-")
+                infix_Expr.append(Token(value: "-"))
+                displayExpr.append(Token(value: "-"))
             }
         }
         else if button == .mul {
             if !isError {
                 if infix_Expr.isEmpty {
-                    infix_Expr.append("0")
+                    infix_Expr.append(Token(value: "0"))
                 }
                 if !endsWithNumber() {
-                    if let lastValue = infix_Expr.last {
+                    if let lastValue = infix_Expr.last?.value {
                         if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
                     }
                 }
-                infix_Expr.append("×")
-                displayExpr.append("×")
+                infix_Expr.append(Token(value: "×"))
+                displayExpr.append(Token(value: "×"))
             }
         }
         else if button == .div {
             if !isError {
                 if infix_Expr.isEmpty {
-                    infix_Expr.append("0")
+                    infix_Expr.append(Token(value: "0"))
                 }
                 if !endsWithNumber() {
-                    if let lastValue = infix_Expr.last {
+                    if let lastValue = infix_Expr.last?.value {
                         if priority(lastValue) != 0 { //    lastValue가 괄호가 아닐 때
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
                     }
                 }
-                infix_Expr.append("÷")
-                displayExpr.append("÷")
+                infix_Expr.append(Token(value: "÷"))
+                displayExpr.append(Token(value: "÷"))
             }
         }
         else if button == .equal {
             if !bracketCorrection() { // 괄호 쌍이 안맞을 경우
-                let bracGap = infix_Expr.filter({ $0 == "(" }).count - infix_Expr.filter({ $0 == ")" }).count
+                let bracGap = infix_Expr.filter({ $0.value == "(" }).count - infix_Expr.filter({ $0.value == ")" }).count
                 if bracGap < 0 {
-                    infix_Expr = Array(repeating: "(", count: -bracGap) + infix_Expr
+                    infix_Expr = Array(repeating: Token(value: "("), count: -bracGap) + infix_Expr
                 }
                 else {
-                    infix_Expr += Array(repeating: ")", count: bracGap)
+                    infix_Expr += Array(repeating: Token(value: ")"), count: bracGap)
                 }
                 displayExpr = infix_Expr
             }
@@ -325,8 +327,10 @@ class CalculatorViewModel: ObservableObject {
                 return
             }
             historyExpr = displayExpr.enumerated().map { index, item in
-                setNumberFmt(
-                    number: item,
+                var modItem = item  // 복사본 생성
+                modItem.automatic = false  // 복사본 수정
+                return setNumberFmt(
+                    number: modItem.value,
                     round: displayExpr.count > 1 && index == 0,
                     portrait: true,
                     historic: true
@@ -364,7 +368,7 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .allClear {
-            displayExpr = ["0"]
+            displayExpr = [Token(value: "0")]
             isError = false
             infix_Expr.removeAll()
             historyExpr.removeAll()
@@ -372,49 +376,49 @@ class CalculatorViewModel: ObservableObject {
         else if button == .clear {
             displayExpr.removeLast()
             if !infix_Expr.isEmpty {
-                let last = infix_Expr.removeLast()
+                let last = infix_Expr.removeLast().value
                 if priority(last) == -1 && !isError {
                     if last.count > 1 {
                         let index = last.index(last.endIndex, offsetBy: -1)
-                        infix_Expr.append(String(last[..<index]))
+                        infix_Expr.append(Token(value: String(last[..<index])))
                     }
                     displayExpr = infix_Expr
                 }
             }
             if displayExpr.isEmpty {
-                displayExpr = ["0"]
+                displayExpr = [Token(value: "0")]
             }
             
         }
         else if button == .dot {
             if isError || infix_Expr.isEmpty {
-                infix_Expr = ["0."]
+                infix_Expr = [Token(value: "0.")]
             }
-            else if endsWithNumber() && !infix_Expr.last!.contains(".") {
-                infix_Expr[infix_Expr.endIndex - 1] += "."
+            else if endsWithNumber() && !infix_Expr.last!.value.contains(".") {
+                infix_Expr[infix_Expr.endIndex - 1].value += "."
             }
             displayExpr = infix_Expr
         }
         else if button == .oppo {
             if !isError {
-                if displayExpr != ["0"] { //  0일때는 동작 안함
+                if displayExpr != [Token(value: "0")] { //  0일때는 동작 안함
                     if endsWithNumber() {   //  수식이 숫자로 끝날 시
                         if let num = infix_Expr.popLast() {  //  endsWithNumber()가 infix_Expr이 비어있을 시 nil 반환
-                            if let op = infix_Expr.last, op == "-" { // 마지막 연산자가 - 일 경우에는 +로 자동 변경
-                                infix_Expr[infix_Expr.endIndex - 1] = "+"
+                            if let op = infix_Expr.last?.value, op == "-" { // 마지막 연산자가 - 일 경우에는 +로 자동 변경
+                                infix_Expr[infix_Expr.endIndex - 1].value = "+"
                                 infix_Expr.append(num)
                             }
                             else {
-                                infix_Expr.append("(")  //  괄호쌍은 숫자와 분리해야 함
-                                infix_Expr.append("-\(num)")
-                                infix_Expr.append(")")
+                                infix_Expr.append(Token(value: "("))    //  괄호쌍은 숫자와 분리해야 함
+                                infix_Expr.append(Token(value: "-\(num.value)"))
+                                infix_Expr.append(Token(value: ")"))
                             }
                         }
                     }
-                    else if infix_Expr.last == ")" { // 닫히는 괄호일 시
+                    else if infix_Expr.last?.value == ")" { // 닫히는 괄호일 시
                         infix_Expr.removeLast()
-                        let num = String(infix_Expr.removeLast().dropFirst())
-                        infix_Expr[infix_Expr.endIndex - 1] = num
+                        let num = String(infix_Expr.removeLast().value.dropFirst())
+                        infix_Expr[infix_Expr.endIndex - 1] = Token(value: num)
                     }
                     displayExpr = infix_Expr
                 }
@@ -423,30 +427,30 @@ class CalculatorViewModel: ObservableObject {
         else if button == .perc {
             if !isError {
                 if infix_Expr.isEmpty {
-                    infix_Expr.append("0")
+                    infix_Expr.append(Token(value: "0"))
                 }
                 if !endsWithNumber() {
                     infix_Expr.removeLast()
                     displayExpr.removeLast()
                 }
-                infix_Expr.append("%")
-                displayExpr.append("%")
+                infix_Expr.append(Token(value: "0"))
+                displayExpr.append(Token(value: "0"))
             }
         }
         else if button == .lbrac {
             if !isError {
                 if endsWithNumber() && !infix_Expr.isEmpty {
-                    infix_Expr.append("×")
+                    infix_Expr.append(Token(value: "×"))
                 }
-                infix_Expr.append("(")
+                infix_Expr.append(Token(value: "("))
             }
         }
         else if button == .rbrac {
             if !isError {
                 if endsWithNumber() && !infix_Expr.isEmpty {
-                    infix_Expr.append("×")
+                    infix_Expr.append(Token(value: "×"))
                 }
-                infix_Expr.append(")")
+                infix_Expr.append(Token(value: ")"))
             }
         }
         else if button == .mc {
@@ -540,51 +544,53 @@ class CalculatorViewModel: ObservableObject {
             if let num: String = button.BtnDisplay.string {
                 if isError {
                     historyExpr.removeAll()
-                    infix_Expr = [num]
-                    displayExpr = [num]
+                    infix_Expr = [Token(value: num)]
+                    displayExpr = [Token(value: num)]
                     isError = false //  새로운 계산 식이 시작이므로 다시 에러 플래그를 false로
                 }
-                else if let last = infix_Expr.last {
-                    if let decimalValue = Decimal(string: last){  //  수식이 숫자로 끝났을 때
+                else if let last = infix_Expr.last?.value {
+                    if let decimalValue = Decimal(string: last), priority(last) == -1 {  //  수식이 숫자로 끝났을 때, priority() 가 있는 이유는 +,-가 Decimal()에 반환값이 0이기 때문
                         if decimalValue == 0 {
                             if last == "0" {
-                                infix_Expr = [num]
+                                infix_Expr = [Token(value: num)]
                             }
                             else if last.contains(".") {
-                                infix_Expr[infix_Expr.endIndex - 1] += num
+                                infix_Expr[infix_Expr.endIndex - 1].value += num
                             }
                             else {
-                                infix_Expr.append(num)
+                                infix_Expr.append(Token(value: num))
                             }
                         }
                         else if currentAC {
-//                            historyExpr.removeAll()
-                            infix_Expr = [num]
+                            infix_Expr = [Token(value: num)]
                         }
                         else {
-                            infix_Expr[infix_Expr.endIndex - 1] += num
+                            infix_Expr[infix_Expr.endIndex - 1].value += num
                         }
                         displayExpr = infix_Expr
                     }
                     else {
                         if bracketCorrection() {
                             if last.last == "." {    //  소수점으로 끝나는 상태일 때
-                                infix_Expr[infix_Expr.endIndex - 1] += num
+                                infix_Expr[infix_Expr.endIndex - 1].value += num
                             }
                             else {
-                                infix_Expr.append(num)
+                                if last.last == ")" {
+                                    infix_Expr.append(Token(value: "×", automatic: true))   //  사용자가 입력하지 않아도 자동으로 들어간걸 알아보도록
+                                }
+                                infix_Expr.append(Token(value: num))
                             }
                             displayExpr = infix_Expr
                         }
                         else {
-                            infix_Expr[infix_Expr.endIndex - 1] = num
-                            infix_Expr.append(")")
+                            infix_Expr[infix_Expr.endIndex - 1].value = num
+                            infix_Expr.append(Token(value: ")"))
                         }
                     }
                 }
                 else {
-                    infix_Expr = [num]
-                    displayExpr = [num]
+                    infix_Expr = [Token(value: num)]
+                    displayExpr = [Token(value: num)]
                 }
                 
             }
@@ -595,7 +601,7 @@ class CalculatorViewModel: ObservableObject {
             currentAC = true
         }
         else if button == .clear {
-            if displayExpr == ["0"] || isError {
+            if displayExpr == [Token(value: "0")] || isError {
                 currentAC = true
             }
         }
@@ -603,7 +609,7 @@ class CalculatorViewModel: ObservableObject {
             // 이 경우엔 currentAC 값을 유지한다
         }
         else {
-            if !isError && infix_Expr.last != "0" {
+            if !isError && infix_Expr.last?.value != "0" {
                 currentAC = false
             }
         }
