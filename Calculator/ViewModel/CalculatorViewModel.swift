@@ -246,7 +246,6 @@ class CalculatorViewModel: ObservableObject {
     
     func tapHistyrExpr() {
         currentAC = false
-//        infix_Expr = historyExpr.map { Token(value: $0, automatic: false) }
         infix_Expr = historyExpr
         displayExpr = infix_Expr
         historyExpr.removeAll()
@@ -335,16 +334,6 @@ class CalculatorViewModel: ObservableObject {
             if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
-//            historyExpr = displayExpr.enumerated().map { index, item in
-//                var modItem = item  // 복사본 생성
-//                modItem.automatic = false  // 복사본 수정
-//                return setNumberFmt(
-//                    number: modItem.value,
-//                    round: displayExpr.count > 1 && index == 0,
-//                    portrait: true,
-//                    historic: true
-//                )
-//            }
             historyExpr = displayExpr
             displayExpr = calculation()
             currentAC = true
@@ -397,6 +386,7 @@ class CalculatorViewModel: ObservableObject {
             }
             if displayExpr.isEmpty {
                 displayExpr = [Token(value: "0")]
+                historyExpr.removeAll()
             }
             
         }
@@ -622,10 +612,6 @@ class CalculatorViewModel: ObservableObject {
             if !isError && infix_Expr.last?.value != "0" {
                 currentAC = false
             }
-        }
-        
-        if !currentAC { //  !currentAC는 현재 수식이 입력 중이라는 것을 의미함
-//            historyExpr.removeAll()
         }
     }
 }
