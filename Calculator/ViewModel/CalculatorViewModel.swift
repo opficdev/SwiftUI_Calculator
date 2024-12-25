@@ -18,17 +18,19 @@ class CalculatorViewModel: ObservableObject {
             UserDefaults.standard.set(unitConversion, forKey: "unitConversion")
         }
     }
-//    @Published var historyExpr: [String] = [] // 회색으로 나타나는 기존 계산식
-//    @Published var displayExpr: [String] = ["0"]  //  화면에 보여지는 수(흰색)
+
     @Published var historyExpr: [Token] = [] // 회색으로 나타나는 기존 계산식
     @Published var displayExpr: [Token] = [Token(value: "0", automatic: false)]
     @Published var currentAC = true // AC 버튼 on off
     @Published var id = UUID()  //  현재 수식에 설정되는 UUID
     @Published var btnSize: CGFloat = 0
     @Published var modeOn = false
-//    private var infix_Expr:[String] = []  // 입력 식(중위)
+    private var undefined = false   //  0으로 나누는 에러
+    private var exprError = false   //  수식 오류
     private var infix_Expr: [Token] = []  // 입력 식(중위)
-    private var isError = false // 현재 계산 중 에러가 발생했는지
+    private var isError: Bool {
+        return undefined || exprError
+    }
     private var today: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -116,7 +118,7 @@ class CalculatorViewModel: ObservableObject {
                             stack.append("\(num1 / num2)")
                         }
                         else{   // 0으로 나누는 예외처리
-                            isError = true
+                            undefined = true
                             return [Token(value: "정의되지 않음")]
                         }
                     }
@@ -129,10 +131,10 @@ class CalculatorViewModel: ObservableObject {
                     stack.removeLast()
                     stack.append("\(num / 100)")
                 }
-                //  잘못된 입력으로 인해 popLast() 들에 의해 데이터가 소멸된다면 복구시켜야 할 소요는 있지 않을까?
                 else {
-                    isError = true
-                    return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
+                    exprError = true
+//                    return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
+                    return [Token(value: "수식 오류")]
                 }
             }
         }
@@ -244,7 +246,7 @@ class CalculatorViewModel: ObservableObject {
         return innerWidth <= outerWidth
     }
     
-    func tapHistyrExpr() {
+    func tapHistoryExpr() {
         currentAC = false
         infix_Expr = historyExpr
         displayExpr = infix_Expr
@@ -324,10 +326,10 @@ class CalculatorViewModel: ObservableObject {
             if !bracketCorrection() { // 괄호 쌍이 안맞을 경우
                 let bracGap = infix_Expr.filter({ $0.value == "(" }).count - infix_Expr.filter({ $0.value == ")" }).count
                 if bracGap < 0 {
-                    infix_Expr = Array(repeating: Token(value: "("), count: -bracGap) + infix_Expr
+                    infix_Expr = Array(repeating: Token(value: "(", automatic: true), count: -bracGap) + infix_Expr
                 }
                 else {
-                    infix_Expr += Array(repeating: Token(value: ")"), count: bracGap)
+                    infix_Expr += Array(repeating: Token(value: ")", automatic: true), count: bracGap)
                 }
                 displayExpr = infix_Expr
             }
@@ -341,7 +343,6 @@ class CalculatorViewModel: ObservableObject {
             
             if !isError {
                 id = UUID()
-                
                 var historyData = [today: [History(id: id, historyExpr: historyExpr, displayExpr: displayExpr)]]
                 if let data = UserDefaults.standard.data(forKey: today) {
                     if let decodeData = try? JSONDecoder().decode([String: [History]].self, from: data), let todayValue = decodeData[today] {
@@ -365,10 +366,16 @@ class CalculatorViewModel: ObservableObject {
                     UserDefaults.standard.set(encodeData, forKey: today)
                 }
             }
+            else if exprError {
+                displayExpr = [Token(value: "수식 오류")]
+                infix_Expr.removeAll()
+                exprError = false //  이래야 새로운 입력을 받을 수 있음
+            }
         }
         else if button == .allClear {
             displayExpr = [Token(value: "0")]
-            isError = false
+            undefined = false
+            exprError = false
             infix_Expr.removeAll()
             historyExpr.removeAll()
         }
@@ -546,7 +553,8 @@ class CalculatorViewModel: ObservableObject {
                     historyExpr.removeAll()
                     infix_Expr = [Token(value: num)]
                     displayExpr = [Token(value: num)]
-                    isError = false //  새로운 계산 식이 시작이므로 다시 에러 플래그를 false로
+                    exprError = false
+                    undefined = false
                 }
                 else if let last = infix_Expr.last?.value {
                     if let decimalValue = Decimal(string: last), priority(last) == -1 {  //  수식이 숫자로 끝났을 때, priority() 가 있는 이유는 +,-가 Decimal()에 반환값이 0이기 때문
@@ -567,7 +575,6 @@ class CalculatorViewModel: ObservableObject {
                         else {
                             infix_Expr[infix_Expr.endIndex - 1].value += num
                         }
-                        displayExpr = infix_Expr
                     }
                     else {
                         if bracketCorrection() {
@@ -580,13 +587,12 @@ class CalculatorViewModel: ObservableObject {
                                 }
                                 infix_Expr.append(Token(value: num))
                             }
-                            displayExpr = infix_Expr
                         }
                         else {
-                            infix_Expr[infix_Expr.endIndex - 1].value = num
-                            infix_Expr.append(Token(value: ")"))
+                            infix_Expr.append(Token(value: num))
                         }
                     }
+                    displayExpr = infix_Expr
                 }
                 else {
                     infix_Expr = [Token(value: num)]
