@@ -27,29 +27,33 @@ struct PortraitView: View {
                         }
                         VStack(spacing: 0) {
                             ScrollView(.horizontal, showsIndicators: false) {
-                                if calcVM.currentAC {
-                                    Text(calcVM.historyExpr.map { calcVM.setNumberFmt(
-                                        number: $0.value,
-                                        round: true,
-                                        portrait: true
-                                    ) }.joined())
-                                        .font(.system(size: calcVM.btnSize * 0.5))  // 얘도 수정이 있긴 해야하는데 displayExpr보다는 변화량이 작음
-                                        .foregroundStyle(Color.gray)
-                                        .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
-                                        .background(
-                                            GeometryReader { geo in
-                                                Color.clear
-                                                    .onAppear {
-                                                        historyWidth = geo.size.width
-                                                    }
-                                                    .onChange(of: calcVM.displayExpr) { _ in
-                                                        historyWidth = geo.size.width
-                                                    }
+                                if calcVM.currentAC {                                    
+                                    HStack(spacing: 0) {
+                                        ForEach(Array(calcVM.historyExpr.enumerated()), id: \.offset) { index, element in
+                                            Text(calcVM.setNumberFmt(
+                                                number: element.value,
+                                                round: true,
+                                                portrait: true
+                                            ))
+                                            .foregroundStyle(calcVM.historyExpr[index].automatic ? Color.elseBtn : Color.gray)
+                                            .font(.system(size: calcVM.btnSize * 0.5))  // 얘도 수정이 있긴 해야하는데 displayExpr보다는 변화량이 작음
+                                            .onTapGesture {
+                                                calcVM.tapHistoryExpr()
                                             }
-                                        )
-                                        .onTapGesture {
-                                            calcVM.tapHistyrExpr()
                                         }
+                                    }
+                                    .scaleEffect(x: -1, y: 1) // 텍스트 다시 반전
+                                    .background(
+                                        GeometryReader { geo in
+                                            Color.clear
+                                                .onAppear {
+                                                    historyWidth = geo.size.width
+                                                }
+                                                .onChange(of: calcVM.displayExpr) { _ in
+                                                    historyWidth = geo.size.width
+                                                }
+                                        }
+                                    )
                                 }
                             }
                             .frame(height: calcVM.btnSize * 0.7)  //  ScrollView 내부 Text와 크기 같을 것
