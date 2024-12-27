@@ -208,11 +208,11 @@ class HistoryViewModel: ObservableObject {
         }
     }
     func setNumberFmt(string: String, style: NumberFormatter.Style) -> String {
-        if let decimalValue = Decimal(string: string) {
+        if let decimalValue = Decimal(string: string), !decimalValue.isZero {   //  0은 그냥 반환해도 됨
             let fmt = NumberFormatter()
             fmt.numberStyle = style
 
-            return fmt.string(for: decimalValue) ?? string
+            return fmt.string(for: decimalValue)!
         }
         return string
     }
