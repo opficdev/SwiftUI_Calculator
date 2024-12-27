@@ -20,7 +20,7 @@ class HistoryViewModel: ObservableObject {
     //  구독 관리용 Combine 변수
     private var cancellables = Set<AnyCancellable>()
     
-    private let disposeBag = DisposeBag()
+    @Published var disposeBag = DisposeBag()
     // BehaviorRelay (RxSwift 데이터 흐름 관리용)
     private let historyDataRelay = BehaviorRelay<[String: [History]]>(value: [:])
     

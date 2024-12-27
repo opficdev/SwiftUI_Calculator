@@ -12,8 +12,6 @@ import RxSwift
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
     @EnvironmentObject var calcVM: CalculatorViewModel
-
-    private let disposeBag = DisposeBag()
     
     var body: some View {
         VStack {
@@ -147,7 +145,7 @@ struct HistoryView: View {
                                     print("에러 발생: \(error.localizedDescription)")
                                 }
                             )
-                            .disposed(by: disposeBag)
+                            .disposed(by: historyVM.disposeBag)
                     } label: {
                         Text("삭제")
                     }
@@ -161,7 +159,7 @@ struct HistoryView: View {
                                 onCompleted: {},
                                 onError: { error in print("에러 발생: \(error)") }
                             )
-                            .disposed(by: disposeBag)
+                            .disposed(by: historyVM.disposeBag)
                         historyVM.modifyHistory = false
                     } label: {
                         Text("기록 지우기")
