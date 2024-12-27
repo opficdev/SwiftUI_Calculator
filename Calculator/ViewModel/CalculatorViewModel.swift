@@ -133,7 +133,6 @@ class CalculatorViewModel: ObservableObject {
                 }
                 else {
                     exprError = true
-//                    return displayExpr //  계산 중 오류 있었을 때인데 다양한 케이스가 존재할 수 있음
                     return [Token(value: "수식 오류")]
                 }
             }
@@ -338,6 +337,7 @@ class CalculatorViewModel: ObservableObject {
             }
             historyExpr = displayExpr
             displayExpr = calculation()
+            print(displayExpr)
             currentAC = true
             infix_Expr = displayExpr
             
@@ -365,11 +365,6 @@ class CalculatorViewModel: ObservableObject {
                 if let encodeData = try? JSONEncoder().encode(historyData) {
                     UserDefaults.standard.set(encodeData, forKey: today)
                 }
-            }
-            else if exprError {
-                displayExpr = [Token(value: "수식 오류")]
-                infix_Expr.removeAll()
-                exprError = false //  이래야 새로운 입력을 받을 수 있음
             }
         }
         else if button == .allClear {
