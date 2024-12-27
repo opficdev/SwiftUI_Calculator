@@ -79,6 +79,7 @@ struct HistoryView: View {
                                                 calcVM.id = arr[idx].id
                                                 calcVM.historyExpr = arr[idx].historyExpr
                                                 calcVM.displayExpr = arr[idx].displayExpr
+                                                calcVM.currentAC = true
                                                 historyVM.showSheet = false
                                             }
                                         }
