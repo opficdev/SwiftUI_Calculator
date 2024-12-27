@@ -264,10 +264,16 @@ class CalculatorViewModel: ObservableObject {
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
+                        else if lastValue != "(" {  //  ( 바로 뒤는 연산자가 추가되면 안됨
+                            infix_Expr.append(Token(value: "+"))
+                            displayExpr.append(Token(value: "+"))
+                        }
                     }
                 }
-                infix_Expr.append(Token(value: "+"))
-                displayExpr.append(Token(value: "+"))
+                else {
+                    infix_Expr.append(Token(value: "+"))
+                    displayExpr.append(Token(value: "+"))
+                }
             }
         }
         else if button == .sub {
@@ -298,10 +304,16 @@ class CalculatorViewModel: ObservableObject {
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
+                        else if lastValue != "(" {  //  ( 바로 뒤는 연산자가 추가되면 안됨
+                            infix_Expr.append(Token(value: "×"))
+                            displayExpr.append(Token(value: "×"))
+                        }
                     }
                 }
-                infix_Expr.append(Token(value: "×"))
-                displayExpr.append(Token(value: "×"))
+                else {
+                    infix_Expr.append(Token(value: "×"))
+                    displayExpr.append(Token(value: "×"))
+                }
             }
         }
         else if button == .div {
@@ -315,13 +327,23 @@ class CalculatorViewModel: ObservableObject {
                             infix_Expr.removeLast()
                             displayExpr.removeLast()
                         }
+                        else if lastValue != "(" {  //  ( 바로 뒤는 연산자가 추가되면 안됨
+                            infix_Expr.append(Token(value: "÷"))
+                            displayExpr.append(Token(value: "÷"))
+                        }
                     }
                 }
-                infix_Expr.append(Token(value: "÷"))
-                displayExpr.append(Token(value: "÷"))
+                else {
+                    infix_Expr.append(Token(value: "÷"))
+                    displayExpr.append(Token(value: "÷"))
+                }
             }
         }
         else if button == .equal {
+            if infix_Expr.isEmpty || isRawExpr() || infix_Expr.last?.value == "(" {
+                return
+            }
+            
             if !bracketCorrection() { // 괄호 쌍이 안맞을 경우
                 let bracGap = infix_Expr.filter({ $0.value == "(" }).count - infix_Expr.filter({ $0.value == ")" }).count
                 if bracGap < 0 {
@@ -331,13 +353,19 @@ class CalculatorViewModel: ObservableObject {
                     infix_Expr += Array(repeating: Token(value: ")", automatic: true), count: bracGap)
                 }
                 displayExpr = infix_Expr
+                
+                var idx = 0
+                while idx < infix_Expr.count {
+                    if infix_Expr[idx].value == "(" && infix_Expr[idx + 1].value == ")" {
+                        infix_Expr.insert(Token(value: "0"), at: idx + 1)
+                        idx += 1    // 0을 넣었으니 다음은 무조건 ) 라서 idx += 1 + 1하고 넘어가도 됨
+                    }
+                    idx += 1
+                }
             }
-            if infix_Expr.isEmpty || isRawExpr() {
-                return
-            }
+            
             historyExpr = displayExpr
             displayExpr = calculation()
-            print(displayExpr)
             currentAC = true
             infix_Expr = displayExpr
             
