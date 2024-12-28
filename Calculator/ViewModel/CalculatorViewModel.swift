@@ -340,17 +340,18 @@ class CalculatorViewModel: ObservableObject {
             }
         }
         else if button == .equal {
-            if infix_Expr.isEmpty || isRawExpr() || infix_Expr.last?.value == "(" {
+            if infix_Expr.isEmpty || isRawExpr() {
                 return
             }
             
             if !bracketCorrection() { // 괄호 쌍이 안맞을 경우
+                let isLastValueWrong = infix_Expr.last?.value == "(" || infix_Expr.last?.value == "-"
                 let bracGap = infix_Expr.filter({ $0.value == "(" }).count - infix_Expr.filter({ $0.value == ")" }).count
                 if bracGap < 0 {
-                    infix_Expr = Array(repeating: Token(value: "(", automatic: true), count: -bracGap) + infix_Expr
+                    infix_Expr = Array(repeating: Token(value: "(", automatic: isLastValueWrong), count: -bracGap) + infix_Expr
                 }
                 else {
-                    infix_Expr += Array(repeating: Token(value: ")", automatic: true), count: bracGap)
+                    infix_Expr += Array(repeating: Token(value: ")", automatic: isLastValueWrong), count: bracGap)
                 }
                 displayExpr = infix_Expr
                 
