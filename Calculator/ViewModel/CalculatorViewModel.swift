@@ -25,8 +25,8 @@ class CalculatorViewModel: ObservableObject {
     @Published var id = UUID()  //  현재 수식에 설정되는 UUID
     @Published var btnSize: CGFloat = 0
     @Published var modeOn = false
-    private var undefined = false   //  0으로 나누는 에러
-    private var exprError = false   //  수식 오류
+    @Published var undefined = false   //  0으로 나누는 에러
+    @Published var exprError = false   //  수식 오류
     private var infix_Expr: [Token] = []  // 입력 식(중위)
     private var isError: Bool {
         return undefined || exprError

@@ -80,6 +80,8 @@ struct HistoryView: View {
                                                 calcVM.historyExpr = arr[idx].historyExpr
                                                 calcVM.displayExpr = arr[idx].displayExpr
                                                 calcVM.currentAC = true
+                                                calcVM.undefined = false
+                                                calcVM.exprError = false
                                                 historyVM.showSheet = false
                                             }
                                         }
