@@ -247,7 +247,11 @@ class CalculatorViewModel: ObservableObject {
     
     func tapHistoryExpr() {
         currentAC = false
-        infix_Expr = historyExpr
+        undefined = false
+        exprError = false
+        infix_Expr = historyExpr.filter {
+                $0.value != ")" && !$0.automatic
+            }
         displayExpr = infix_Expr
         historyExpr.removeAll()
     }
