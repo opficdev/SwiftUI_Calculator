@@ -63,8 +63,8 @@ class CalculatorViewModel: ObservableObject {
     
     //입력된 수식을 연산자 우선순위에 맞게 후위표기로 변경
     private func infix_Postfix() -> [String] {
-       var postfix:[String] = []
-       var stack:[String] = []
+        var postfix:[String] = []
+        var stack:[String] = []
         for tokenValue in (infix_Expr.map { $0.value }) {
             if tokenValue == "+" || tokenValue == "-" || tokenValue == "×" || tokenValue == "÷" {
                 while !stack.isEmpty && (priority(tokenValue) <= priority(stack.last!)){
@@ -94,8 +94,8 @@ class CalculatorViewModel: ObservableObject {
     
     //변경된 후위표기 식을 스택을 통해 계산
     private func calculation() -> [Token] {
-       let postfix = infix_Postfix()
-       var stack:[String] = []
+        let postfix = infix_Postfix()
+        var stack:[String] = []
         for i in postfix{
             if i != "+" && i != "-" && i != "×" && i != "÷" && i != "%" {
                 stack.append(i)
@@ -615,6 +615,10 @@ class CalculatorViewModel: ObservableObject {
                                 }
                                 infix_Expr.append(Token(value: num))
                             }
+                        }
+                        else if last == "-" {
+                            infix_Expr.removeLast()
+                            infix_Expr.append(Token(value: "-" + num))
                         }
                         else {
                             infix_Expr.append(Token(value: num))
