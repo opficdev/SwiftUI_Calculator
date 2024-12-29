@@ -42,7 +42,7 @@ class HistoryViewModel: ObservableObject {
                                    // Relay를 통해 Rx 기반 데이터 스트림 업데이트
                                    self.historyDataRelay.accept(decodeData)
                                    // 로컬 변수에도 데이터 업데이트
-                                   self.historyData[decodeData.keys.first!] = decodeData.values.first!
+                                   self.historyData[decodeData.keys.first!] = decodeData[decodeData.keys.first!]
                             }
                         }
                     }
