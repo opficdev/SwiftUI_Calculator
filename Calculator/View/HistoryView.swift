@@ -27,69 +27,67 @@ struct HistoryView: View {
                 .padding()
             }
             if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String], !dateArr.isEmpty {
-                VStack {
-                    ScrollView {
-                        ForEach(dateArr, id: \.self) { dateString in
-                            if let arr = historyVM.historyData[dateString],
-                               let date = historyVM.relativeDateString(for: dateString) {
-                                LazyVStack(alignment: .leading, spacing: 0) {
-                                    Text(date)
-                                        .foregroundStyle(Color.gray)
-                                        .font(.title3)
-                                        .padding([.bottom, .leading])
-                                    ForEach(arr.indices, id: \.self) { idx in
-                                        HStack(spacing: 0) {
-                                            if historyVM.modifyHistory {
-                                                Button {
-                                                    historyVM.historyData[dateString]?[idx].CheckToggle()
-                                                } label: {
-                                                    if arr[idx].isChecked {
-                                                        Image(systemName: "checkmark.circle.fill")
-                                                            .foregroundStyle(Color.orange)
-                                                            .font(.title3)
-                                                    }
-                                                    else {
-                                                        Image(systemName: "circle")
-                                                            .foregroundStyle(Color.gray)
-                                                            .font(.title3)
-                                                    }
+                ScrollView {
+                    ForEach(dateArr, id: \.self) { dateString in
+                        if let arr = historyVM.historyData[dateString],
+                           let date = historyVM.relativeDateString(for: dateString) {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                Text(date)
+                                    .foregroundStyle(Color.gray)
+                                    .font(.title3)
+                                    .padding([.bottom, .leading])
+                                ForEach(arr.indices, id: \.self) { idx in
+                                    HStack(spacing: 0) {
+                                        if historyVM.modifyHistory {
+                                            Button {
+                                                historyVM.historyData[dateString]?[idx].CheckToggle()
+                                            } label: {
+                                                if arr[idx].isChecked {
+                                                    Image(systemName: "checkmark.circle.fill")
+                                                        .foregroundStyle(Color.orange)
+                                                        .font(.title3)
                                                 }
-                                                .transition(AnyTransition.opacity.combined(with: .move(edge: .leading)))
-                                                .padding(.trailing)
+                                                else {
+                                                    Image(systemName: "circle")
+                                                        .foregroundStyle(Color.gray)
+                                                        .font(.title3)
+                                                }
                                             }
-                                            VStack(alignment: .leading) {
-                                                Divider()
-                                                    .padding(.bottom)
-                                                Text(arr[idx].historyExpr.map{ historyVM.setNumberFmt(string: $0.value, style: .decimal) }.joined())
-                                                    .foregroundStyle(Color.gray)
-                                                Text(historyVM.setNumberFmt(string: arr[idx].displayExpr.map{$0.value}.joined(), style: .decimal))
-                                                    .font(.title3)
-                                                    .foregroundStyle(Color.white)
-                                                Divider()
-                                                    .padding(.top)
-                                            }
+                                            .transition(AnyTransition.opacity.combined(with: .move(edge: .leading)))
+                                            .padding(.trailing)
                                         }
-                                        .padding(.leading)
-                                        .background((historyVM.modifyHistory && arr[idx].isChecked) ||
-                                                    (!historyVM.modifyHistory && arr[idx].id == calcVM.id)
-                                                    ? Color.gray.opacity(0.1) : Color.clear)
-                                        .contentShape(Rectangle()) // HStack의 터치 영역 확장
-                                        .onTapGesture {
-                                            if !historyVM.modifyHistory {
-                                                calcVM.id = arr[idx].id
-                                                calcVM.historyExpr = arr[idx].historyExpr
-                                                calcVM.displayExpr = arr[idx].displayExpr
-                                                calcVM.currentAC = true
-                                                calcVM.undefined = false
-                                                calcVM.exprError = false
-                                                historyVM.showSheet = false
-                                            }
+                                        VStack(alignment: .leading) {
+                                            Divider()
+                                                .padding(.bottom)
+                                            Text(arr[idx].historyExpr.map{ historyVM.setNumberFmt(string: $0.value, style: .decimal) }.joined())
+                                                .foregroundStyle(Color.gray)
+                                            Text(historyVM.setNumberFmt(string: arr[idx].displayExpr.map{$0.value}.joined(), style: .decimal))
+                                                .font(.title3)
+                                                .foregroundStyle(Color.white)
+                                            Divider()
+                                                .padding(.top)
                                         }
                                     }
-                                    .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
+                                    .padding(.leading)
+                                    .background((historyVM.modifyHistory && arr[idx].isChecked) ||
+                                                (!historyVM.modifyHistory && arr[idx].id == calcVM.id)
+                                                ? Color.gray.opacity(0.1) : Color.clear)
+                                    .contentShape(Rectangle()) // HStack의 터치 영역 확장
+                                    .onTapGesture {
+                                        if !historyVM.modifyHistory {
+                                            calcVM.id = arr[idx].id
+                                            calcVM.historyExpr = arr[idx].historyExpr
+                                            calcVM.displayExpr = arr[idx].displayExpr
+                                            calcVM.currentAC = true
+                                            calcVM.undefined = false
+                                            calcVM.exprError = false
+                                            historyVM.showSheet = false
+                                        }
+                                    }
                                 }
-                                .padding(.top)
+                                .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
                             }
+                            .padding(.top)
                         }
                     }
                 }
@@ -187,7 +185,6 @@ struct HistoryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.deepGray)
-        .edgesIgnoringSafeArea(.bottom)
         .onDisappear {
             historyVM.modifyHistory = false
             historyVM.resetCheck()
