@@ -28,14 +28,16 @@ struct HistoryView: View {
             }
             if let dateArr = UserDefaults.standard.array(forKey: "dateArr") as? [String], !dateArr.isEmpty {
                 ScrollView {
-                    ForEach(dateArr, id: \.self) { dateString in
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(dateArr, id: \.self) { dateString in
                         if let arr = historyVM.historyData[dateString],
                            let date = historyVM.relativeDateString(for: dateString) {
-                            LazyVStack(alignment: .leading, spacing: 0) {
                                 Text(date)
                                     .foregroundStyle(Color.gray)
                                     .font(.title3)
-                                    .padding([.bottom, .leading])
+                                    .padding(.top, dateString == dateArr.first ? 0 : 20)
+                                    .padding([.vertical, .leading])
+                            
                                 ForEach(arr.indices, id: \.self) { idx in
                                     HStack(spacing: 0) {
                                         if historyVM.modifyHistory {
@@ -87,10 +89,10 @@ struct HistoryView: View {
                                 }
                                 .animation(.easeIn(duration: 0.2), value: historyVM.modifyHistory)
                             }
-                            .padding(.top)
                         }
                     }
                 }
+                .padding(.top)
                 .toolbar {
                     if !historyVM.historyData.isEmpty {
                         ToolbarItem(placement: .bottomBar) {
