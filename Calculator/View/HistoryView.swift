@@ -38,7 +38,7 @@ struct HistoryView: View {
                                     .padding(.top, dateString == dateArr.first ? 0 : 20)
                                     .padding([.vertical, .leading])
                             
-                                ForEach(arr.indices, id: \.self) { idx in
+                            ForEach(Array(zip(arr.indices, arr)), id: \.0) { idx, item in
                                     HStack(spacing: 0) {
                                         if historyVM.modifyHistory {
                                             Button {
@@ -61,25 +61,26 @@ struct HistoryView: View {
                                         VStack(alignment: .leading) {
                                             Divider()
                                                 .padding(.bottom)
-                                            Text(arr[idx].historyExpr.map{ historyVM.setNumberFmt(string: $0.value, style: .decimal) }.joined())
+                                            Text(item.historyExpr.map{ historyVM.setNumberFmt(string: $0.value, style: .decimal) }.joined())
                                                 .foregroundStyle(Color.gray)
-                                            Text(historyVM.setNumberFmt(string: arr[idx].displayExpr.map{$0.value}.joined(), style: .decimal))
+                                            Text(historyVM.setNumberFmt(string: item.displayExpr.map{$0.value}.joined(), style: .decimal))
                                                 .font(.title3)
                                                 .foregroundStyle(Color.white)
                                             Divider()
                                                 .padding(.top)
                                         }
                                     }
+                                    .id(item.id)
                                     .padding(.leading)
-                                    .background((historyVM.modifyHistory && arr[idx].isChecked) ||
-                                                (!historyVM.modifyHistory && arr[idx].id == calcVM.id)
+                                    .background((historyVM.modifyHistory && item.isChecked) ||
+                                                (!historyVM.modifyHistory && item.id == calcVM.id)
                                                 ? Color.gray.opacity(0.1) : Color.clear)
                                     .contentShape(Rectangle()) // HStack의 터치 영역 확장
                                     .onTapGesture {
                                         if !historyVM.modifyHistory {
-                                            calcVM.id = arr[idx].id
-                                            calcVM.historyExpr = arr[idx].historyExpr
-                                            calcVM.displayExpr = arr[idx].displayExpr
+                                            calcVM.id = item.id
+                                            calcVM.historyExpr = item.historyExpr
+                                            calcVM.displayExpr = item.displayExpr
                                             calcVM.currentAC = true
                                             calcVM.undefined = false
                                             calcVM.exprError = false
