@@ -256,6 +256,15 @@ class CalculatorViewModel: ObservableObject {
         historyExpr.removeAll()
     }
     
+    func setExpr(expr: History) {
+        id = expr.id
+        historyExpr = expr.historyExpr
+        displayExpr = expr.displayExpr
+        currentAC = true
+        undefined = false
+        exprError = false
+    }
+    
     func handleButtonPress(_ button: BtnType) {
         if button == .add {
             if !isError {

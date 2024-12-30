@@ -78,12 +78,7 @@ struct HistoryView: View {
                                     .contentShape(Rectangle()) // HStack의 터치 영역 확장
                                     .onTapGesture {
                                         if !historyVM.modifyHistory {
-                                            calcVM.id = item.id
-                                            calcVM.historyExpr = item.historyExpr
-                                            calcVM.displayExpr = item.displayExpr
-                                            calcVM.currentAC = true
-                                            calcVM.undefined = false
-                                            calcVM.exprError = false
+                                            calcVM.setExpr(expr: item)
                                             historyVM.showSheet = false
                                         }
                                     }
