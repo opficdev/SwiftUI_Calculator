@@ -17,7 +17,7 @@ let portraitBtn: [[BtnType]] = [
 
 let landscapeBtn: [[BtnType]] = [
     [._7, ._8, ._9, .allClear, .div],
-    [._4, ._5, ._6, .sub, .oppo],
+    [._4, ._5, ._6, .oppo, .mul],
     [._1, ._2, ._3, .perc, .sub],
     [.emoji, ._0, .dot, .equal, .add]
 ]
