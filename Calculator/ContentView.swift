@@ -34,14 +34,15 @@ struct ContentView: View {
                         .font(.system(size: 22))
                         .foregroundStyle(Color.orange)
                 })
-//            if orientation.isPortrait {
+            if orientation.isPortrait {
                 PortraitView()
                     .environmentObject(calcVM)
                     .padding(.bottom)
-//                }
-//                else {  //가로모드
-//
-//                }
+                }
+                else {  //가로모드
+                    LandscapeView()
+                        .environmentObject(calcVM)
+                }
                 
             }
             .padding()

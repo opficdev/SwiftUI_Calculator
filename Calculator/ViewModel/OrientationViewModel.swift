@@ -33,7 +33,7 @@ class OrientationViewModel: ObservableObject {
             })
             .disposed(by: disposeBag)
         
-//  MARK: Combine 관련 코드
+//  MARK: Combine 코드
 //        orientationSubscription = NotificationCenter.default
 //                .publisher(for: UIDevice.orientationDidChangeNotification)
 //                .compactMap { $0.object as? UIDevice }
