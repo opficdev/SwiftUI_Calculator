@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
-import RxSwift
 
 struct HistoryView: View {
     @EnvironmentObject var historyVM: HistoryViewModel
