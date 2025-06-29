@@ -5,7 +5,7 @@ SwiftUI로 애플 기본 계산기 앱을 구현
 - iOS 18에 기본 탑재된 계산기 앱을 SwiftUI로 프론트엔드, Swift로 백엔드를 구현
 
 - **사용된 패턴**
-    - MVVM + MVC
+    - MVVM
 
 - **최소 iOS 버전**
     - iOS 16
